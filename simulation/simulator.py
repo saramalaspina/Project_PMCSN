@@ -24,7 +24,6 @@ START = 0.0  # initial time
 STOP = 86400.0  # terminal (close the door) time
 INFINITY = (100.0 * STOP)  # must be much larger than STOP
 arrivalTemp = START  # global temp var for getArrival function
-p = 0.5  # Probability to move to the second server
 
 
 def Min(a, b, c):
@@ -137,13 +136,6 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
             t.completion_edge = t.current + GetServiceEdgeE()
 
     elif t.current == t.completion_edge:  # Process completion at edge node
-        index_edge += 1
-        number_edge -= 1
-        if number_edge > 0:
-            t.completion_edge = t.current + GetServiceEdgeE()
-        else:
-            t.completion_edge = INFINITY
-
         # Handle different actions based on job type (E or C)
         if job_type == 'E':
             selectStream(3)  # Use a different stream for this decision
@@ -157,6 +149,15 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
         else:  # job_type == 'C'
             index_exit_C += 1  # Job of type C exits the system after second edge processing
 
+        index_edge += 1
+        number_edge -= 1
+        if number_edge > 0:
+            if job_type == 'E':  # Continue serving type E job
+                t.completion_edge = t.current + GetServiceEdgeE()
+            else:  # Serve type C job returning from cloud
+                t.completion_edge = t.current + GetServiceEdgeC()
+        else:
+            t.completion_edge = INFINITY
 
     elif t.current == t.completion_cloud:  # Process completion at cloud server (job becomes type C)
         index_cloud += 1
@@ -165,7 +166,6 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
             t.completion_cloud = t.current + GetServiceCloud()
         else:
             t.completion_cloud = INFINITY
-
         # Job returns to edge node for final service (now type C)
         number_edge += 1
         job_type = 'C'  # The job is now of type C
