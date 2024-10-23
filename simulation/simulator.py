@@ -107,6 +107,11 @@ t.completion_edge = INFINITY  # No completions initially
 t.completion_cloud = INFINITY  # No completions initially
 
 # Simulation loop
+queue_edge = []  # A list to track the type of jobs waiting at the edge node
+queue_cloud = []  # A list to track jobs in the cloud queue
+in_service_edge = False  # Edge node starts idle
+in_service_cloud = False  # Cloud server starts idle
+
 while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
     t.next = Min(t.arrival, t.completion_edge, t.completion_cloud)  # Find next event
 
@@ -114,35 +119,44 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
     if number_edge > 0:
         area_edge.node += (t.next - t.current) * number_edge
         area_edge.queue += (t.next - t.current) * (number_edge - 1)
-        area_edge.service += (t.next - t.current)
+        if in_service_edge:
+            area_edge.service += (t.next - t.current)
 
     # Update statistics for cloud server
     if number_cloud > 0:
         area_cloud.node += (t.next - t.current) * number_cloud
         area_cloud.queue += (t.next - t.current) * (number_cloud - 1)
-        area_cloud.service += (t.next - t.current)
+        if in_service_cloud:
+            area_cloud.service += (t.next - t.current)
 
     t.current = t.next  # Advance the clock
 
     if t.current == t.arrival:  # Process arrival at edge node
         number_edge += 1
-        job_type = 'E'
+        queue_edge.append('E')  # New jobs are of type E at first
         t.arrival = GetArrival()  # Schedule next arrival
         if t.arrival > STOP:
             t.last = t.current
             t.arrival = INFINITY
 
-        if number_edge == 1:  # If edge node is idle, start service
-            t.completion_edge = t.current + GetServiceEdgeE()
+        # If the edge server is idle, start serving the job immediately
+        if not in_service_edge:
+            job_type = queue_edge.pop(0)
+            in_service_edge = True
+            if job_type == 'E':
+                t.completion_edge = t.current + GetServiceEdgeE()
+            else:
+                t.completion_edge = t.current + GetServiceEdgeC()
 
     elif t.current == t.completion_edge:  # Process completion at edge node
-        # Handle different actions based on job type (E or C)
         if job_type == 'E':
             selectStream(3)  # Use a different stream for this decision
             if random() < P_C:  # With probability P_C, send job to cloud server
                 number_cloud += 1
-                job_type = 'C'  # The job becomes type C after being processed by cloud
-                if number_cloud == 1:  # If cloud server is idle, start service
+               # queue_cloud.append('C')  # Mark it as a type C job returning from cloud
+                if not in_service_cloud:  # If cloud server is idle, start service
+                    #job_type_cloud = queue_cloud.pop(0)
+                    in_service_cloud = True
                     t.completion_cloud = t.current + GetServiceCloud()
             else:
                 index_exit_E += 1  # Job of type E exits the system
@@ -151,10 +165,14 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
 
         index_edge += 1
         number_edge -= 1
-        if number_edge > 0:
-            if job_type == 'E':  # Continue serving type E job
+        in_service_edge = False
+
+        if len(queue_edge) > 0:  # If there are jobs in the queue, serve the next one
+            next_job_type = queue_edge.pop(0)
+            in_service_edge = True
+            if next_job_type == 'E':
                 t.completion_edge = t.current + GetServiceEdgeE()
-            else:  # Serve type C job returning from cloud
+            else:
                 t.completion_edge = t.current + GetServiceEdgeC()
         else:
             t.completion_edge = INFINITY
@@ -162,15 +180,23 @@ while (t.arrival < STOP) or (number_edge > 0) or (number_cloud > 0):
     elif t.current == t.completion_cloud:  # Process completion at cloud server (job becomes type C)
         index_cloud += 1
         number_cloud -= 1
-        if number_cloud > 0:
+        in_service_cloud = False
+
+        if len(queue_cloud) > 0:  # If there are jobs in the cloud queue, serve the next one
+            job_type_cloud = queue_cloud.pop(0)
+            in_service_cloud = True
             t.completion_cloud = t.current + GetServiceCloud()
         else:
             t.completion_cloud = INFINITY
+
         # Job returns to edge node for final service (now type C)
         number_edge += 1
-        job_type = 'C'  # The job is now of type C
-        if number_edge == 1:  # If edge node is idle, start service
+        queue_edge.append('C')  # Mark it as a type C job returning from cloud
+        if not in_service_edge:  # If edge node is idle, start service
+            job_type = queue_edge.pop(0)
+            in_service_edge = True
             t.completion_edge = t.current + GetServiceEdgeC()
+
 
 # End of simulation loop
 
