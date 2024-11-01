@@ -70,13 +70,16 @@ class Time:
 index_edge = 0  # used to count departed jobs from edge node
 index_cloud = 0  # used to count departed jobs from cloud server
 
-index_E = 0
-index_C = 0
+count_E = 0 # number of type E departed jobs
+count_C = 0 # number of type E departed jobs
 
 number_edge = 0  # number of jobs in server 1
 number_cloud = 0  # number of jobs in server 2
-number_E = 0 # number of type E jobs
+number_E = 0 # number of type E jobs in edge node
 number_C = 0 # number of type C jobs in edge node
+index_E = 0 # number of type E processed jobs in edge node
+index_C = 0 # number of type C processed jobs in edge node
+in_service = None # tracking type of job in service
 area_edge = Track()  # stats tracking for server 1
 area_cloud = Track()  # stats tracking for server 2
 area_E = Track() # stats tracking job of type E
@@ -91,11 +94,10 @@ t.arrival = GetArrival()  # First arrival for server 1
 t.completion_edge = INFINITY  # No completions initially
 t.completion_cloud = INFINITY  # No completions initially
 
+queue_edge_E = 0  # variable to track type E jobs waiting at the edge node
+queue_edge_C = 0  # variable to track type C jobs waiting at the edge node
+
 # Simulation loop
-queue_edge_E = []  # A list to track type E jobs waiting at the edge node
-queue_edge_C = []  # A list to track type C jobs waiting at the edge node
-
-
 while (t.arrival < STOP) or (number_edge + number_cloud > 0):
     t.next = Min(t.arrival, t.completion_edge, t.completion_cloud)  # next event time   */
 
@@ -128,7 +130,7 @@ while (t.arrival < STOP) or (number_edge + number_cloud > 0):
     if (t.current == t.arrival):  # process an arrival */
         number_edge += 1
         number_E += 1
-        queue_edge_E.append("E")
+        queue_edge_E +=1
         t.arrival = GetArrival()
         if (t.arrival > STOP):
             t.last = t.current
@@ -136,29 +138,37 @@ while (t.arrival < STOP) or (number_edge + number_cloud > 0):
 
         if (number_edge == 1):
             t.completion_edge = t.current + GetServiceEdgeE()
+            in_service = "E"
+            queue_edge_E -= 1
 
     elif t.current == t.completion_edge: # Process completion at edge node
-        if queue_edge_E[0] == "E":  # The job has not returned yet
+        if in_service == "E":  # The job has not returned yet
             number_E -=1
+            index_E += 1
             selectStream(3)
             if random() < P_C:  # With probability p, send job to server 2
                 number_cloud += 1
                 if number_cloud == 1:  # If server 2 is idle, start service
                     t.completion_cloud = t.current + GetServiceCloud()
             else:
-                index_E += 1
+                count_E += 1
         else:
-            index_C +=1
+            count_C +=1
             number_C -=1
+            index_C += 1
 
         index_edge += 1
         number_edge -= 1
-        queue_edge.pop(0)
+
         if number_edge > 0:
-            if queue_edge[0] == "E":
+            if queue_edge_E:
                 t.completion_edge = t.current + GetServiceEdgeE()
+                in_service = "E"
+                queue_edge_E -= 1
             else:
                 t.completion_edge = t.current + GetServiceEdgeC()
+                in_service = "C"
+                queue_edge_C -= 1
         else:
             t.completion_edge = INFINITY
 
@@ -172,9 +182,11 @@ while (t.arrival < STOP) or (number_edge + number_cloud > 0):
 
         number_edge += 1
         number_C += 1
-        queue_edge.append("C")
+        queue_edge_C +=1
         if number_edge == 1:  # If edge node is idle, start service
             t.completion_edge = t.current + GetServiceEdgeC()
+            in_service = "C"
+            queue_edge_C -= 1
 
 # EndWhile
 
@@ -197,7 +209,7 @@ if(index_cloud > 0):
     print(f"   Average # in the queue .. = {area_cloud.queue / t.current:.2f}")
     print(f"   Utilization ............. = {area_cloud.service / t.current:.2f}")
 
-print(f"\nFor {index_E} type E jobs:")
+print(f"\nFor {index_E} type E jobs processed by edge node:")
 print(f"   Average wait ............ = {area_E.node / index_E:.2f}")
 print(f"   Average delay ........... = {area_E.queue / index_E:.2f}")
 print(f"   Average service time .... = {area_E.service / index_E:.2f}")
@@ -214,5 +226,5 @@ if(index_C>0):
     print(f"   Average # in the queue .. = {area_C.queue / t.current:.2f}")
     print(f"   Utilization ............. = {area_C.service / t.current:.2f}")
 
-print(f"\nCount E = {index_E}")
-print(f"Count C = {index_C}")
+print(f"\nNumber of type E jobs that leave the system = {count_E}")
+print(f"Number of type C jobs that leave the system = = {count_C}")
