@@ -92,7 +92,9 @@ t.completion_edge = INFINITY  # No completions initially
 t.completion_cloud = INFINITY  # No completions initially
 
 # Simulation loop
-queue_edge = []  # A list to track the type of jobs waiting at the edge node
+queue_edge_E = []  # A list to track type E jobs waiting at the edge node
+queue_edge_C = []  # A list to track type C jobs waiting at the edge node
+
 
 while (t.arrival < STOP) or (number_edge + number_cloud > 0):
     t.next = Min(t.arrival, t.completion_edge, t.completion_cloud)  # next event time   */
@@ -126,7 +128,7 @@ while (t.arrival < STOP) or (number_edge + number_cloud > 0):
     if (t.current == t.arrival):  # process an arrival */
         number_edge += 1
         number_E += 1
-        queue_edge.append("E")
+        queue_edge_E.append("E")
         t.arrival = GetArrival()
         if (t.arrival > STOP):
             t.last = t.current
@@ -136,7 +138,7 @@ while (t.arrival < STOP) or (number_edge + number_cloud > 0):
             t.completion_edge = t.current + GetServiceEdgeE()
 
     elif t.current == t.completion_edge: # Process completion at edge node
-        if queue_edge[0] == "E":  # The job has not returned yet
+        if queue_edge_E[0] == "E":  # The job has not returned yet
             number_E -=1
             selectStream(3)
             if random() < P_C:  # With probability p, send job to server 2
