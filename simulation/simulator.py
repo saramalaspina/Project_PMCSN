@@ -46,7 +46,11 @@ def GetServiceCloud():
     selectStream(2)
     return Exponential(0.8)
 
-
+# stream 0 -> arrivi dall'esterno
+# stream 1 -> servizio dell'edge tipo E
+# stream 2 -> servizio cloud server
+# stream 3 -> probabilità di routing
+# stream 4 -> servizio dell'edge tipo C
 
 class Track:
     def __init__(self):
@@ -95,90 +99,94 @@ t.completion_cloud = INFINITY  # No completions initially
 
 queue_edge = []  # A list to track the type of jobs waiting at the edge node
 
-# Simulation loop
-while (t.arrival < STOP) or (number_edge + number_cloud > 0):
-    t.next = Min(t.arrival, t.completion_edge, t.completion_cloud)  # next event time   */
+def finite_simulation(num):
+    # Simulation loop
+    while (t.arrival < STOP) or (number_edge + number_cloud > 0):
+        t.next = Min(t.arrival, t.completion_edge, t.completion_cloud)  # next event time   */
 
-    if (number_edge > 0):  # update integrals  */
-        area_edge.node += (t.next - t.current) * number_edge
-        area_edge.queue += (t.next - t.current) * (number_edge - 1)
-        area_edge.service += (t.next - t.current)
-    # EndIf
+        if (number_edge > 0):  # update integrals  */
+            area_edge.node += (t.next - t.current) * number_edge
+            area_edge.queue += (t.next - t.current) * (number_edge - 1)
+            area_edge.service += (t.next - t.current)
+        # EndIf
 
-    if (number_cloud > 0):  # update integrals  */
-        area_cloud.node += (t.next - t.current) * number_cloud
-        area_cloud.queue += (t.next - t.current) * (number_cloud - 1)
-        area_cloud.service += (t.next - t.current)
-    # EndIf
+        if (number_cloud > 0):  # update integrals  */
+            area_cloud.node += (t.next - t.current) * number_cloud
+            area_cloud.queue += (t.next - t.current) * (number_cloud - 1)
+            area_cloud.service += (t.next - t.current)
+        # EndIf
 
-    if (number_E > 0):  # update integrals  */
-        area_E.node += (t.next - t.current) * number_E
-        area_E.queue += (t.next - t.current) * (number_E - 1)
-        area_E.service += (t.next - t.current)
-    # EndIf
+        if (number_E > 0):  # update integrals  */
+            area_E.node += (t.next - t.current) * number_E
+            area_E.queue += (t.next - t.current) * (number_E - 1)
+            area_E.service += (t.next - t.current)
+        # EndIf
 
-    if (number_C > 0):  # update integrals  */
-        area_C.node += (t.next - t.current) * number_C
-        area_C.queue += (t.next - t.current) * (number_C - 1)
-        area_C.service += (t.next - t.current)
-    # EndIf
+        if (number_C > 0):  # update integrals  */
+            area_C.node += (t.next - t.current) * number_C
+            area_C.queue += (t.next - t.current) * (number_C - 1)
+            area_C.service += (t.next - t.current)
+        # EndIf
 
-    t.current = t.next  # advance the clock */
+        t.current = t.next  # advance the clock */
 
-    if (t.current == t.arrival):  # process an arrival */
-        number_edge += 1
-        number_E += 1
-        queue_edge.append("E")
-        t.arrival = GetArrival()
-        if (t.arrival > STOP):
-            t.last = t.current
-            t.arrival = INFINITY
+        if (t.current == t.arrival):  # process an arrival */
+            number_edge += 1
+            number_E += 1
+            queue_edge.append("E")
+            t.arrival = GetArrival()
+            if (t.arrival > STOP):
+                t.last = t.current
+                t.arrival = INFINITY
 
-        if (number_edge == 1):
-            t.completion_edge = t.current + GetServiceEdgeE()
-
-    elif t.current == t.completion_edge: # Process completion at edge node
-        if queue_edge[0] == "E":  # The job has not returned yet
-            number_E -=1
-            index_E += 1
-            selectStream(3)
-            if random() < P_C:  # With probability p, send job to server 2
-                number_cloud += 1
-                if number_cloud == 1:  # If server 2 is idle, start service
-                    t.completion_cloud = t.current + GetServiceCloud()
-            else:
-                count_E += 1
-        else:
-            count_C +=1
-            index_C += 1
-            number_C -=1
-
-        index_edge += 1
-        number_edge -= 1
-        queue_edge.pop(0)
-        if number_edge > 0:
-            if queue_edge[0] == "E":
+            if (number_edge == 1):
                 t.completion_edge = t.current + GetServiceEdgeE()
+
+        elif t.current == t.completion_edge:  # Process completion at edge node
+            if queue_edge[0] == "E":  # The job has not returned yet
+                number_E -= 1
+                index_E += 1
+                selectStream(3)
+                if random() < P_C:  # With probability p, send job to server 2
+                    number_cloud += 1
+                    if number_cloud == 1:  # If server 2 is idle, start service
+                        t.completion_cloud = t.current + GetServiceCloud()
+                else:
+                    count_E += 1
             else:
+                count_C += 1
+                index_C += 1
+                number_C -= 1
+
+            index_edge += 1
+            number_edge -= 1
+            queue_edge.pop(0)
+            if number_edge > 0:
+                if queue_edge[0] == "E":
+                    t.completion_edge = t.current + GetServiceEdgeE()
+                else:
+                    t.completion_edge = t.current + GetServiceEdgeC()
+            else:
+                t.completion_edge = INFINITY
+
+        elif t.current == t.completion_cloud:  # Process completion at cloud server
+            index_cloud += 1
+            number_cloud -= 1
+            if number_cloud > 0:
+                t.completion_cloud = t.current + GetServiceCloud()
+            else:
+                t.completion_cloud = INFINITY
+
+            number_edge += 1
+            number_C += 1
+            queue_edge.append("C")
+            if number_edge == 1:  # If edge node is idle, start service
                 t.completion_edge = t.current + GetServiceEdgeC()
-        else:
-            t.completion_edge = INFINITY
 
-    elif t.current == t.completion_cloud:  # Process completion at cloud server
-        index_cloud += 1
-        number_cloud -= 1
-        if number_cloud > 0:
-            t.completion_cloud = t.current + GetServiceCloud()
-        else:
-            t.completion_cloud = INFINITY
+    # EndWhile
 
-        number_edge += 1
-        number_C += 1
-        queue_edge.append("C")
-        if number_edge == 1:  # If edge node is idle, start service
-            t.completion_edge = t.current + GetServiceEdgeC()
 
-# EndWhile
+
 
 # Output the statistics for edge node and cloud server
 print(f"\nFor {index_edge} jobs processed by edge node (first and second pass):")
