@@ -10,3 +10,4 @@ class Server:
 def release_server(server):
     server.occupied = False
     server.end_service_time = INF
+
