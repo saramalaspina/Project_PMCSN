@@ -7,6 +7,8 @@ STOP = 86400.0  # terminal (close the door) time
 INFINITY = (100.0 * STOP)  # must be much larger than STOP
 arrivalTemp = START  # global temp var for getArrival function
 
+plantSeeds(SEED) #la faccio nel main
+
 
 def Min(a, b, c):
     """Return the smallest of a, b, c."""
@@ -72,6 +74,8 @@ class Time:
 ##########################Main Program##################################
 
 def finite_simulation():
+    global arrivalTemp
+    arrivalTemp = START #reset global variable
 
     index_edge = 0  # used to count departed jobs from edge node
     index_cloud = 0  # used to count departed jobs from cloud server
@@ -90,8 +94,6 @@ def finite_simulation():
     area_E = Track() # stats tracking job of type E
     area_C = Track() # stats tracking job of type C in edge node
     t = Time()
-
-    plantSeeds(SEED)
 
     # Initialize times
     t.current = START
@@ -186,7 +188,6 @@ def finite_simulation():
 
     # EndWhile
 
-
     # Output the statistics for edge node and cloud server
     print(f"\nFor {index_edge} jobs processed by edge node (first and second pass):")
     print(f"   Average wait ............ = {area_edge.node / index_edge:.2f}")
@@ -225,3 +226,17 @@ def finite_simulation():
 
     print(f"\nNumber of type E jobs that leave the system = {count_E}")
     print(f"Number of type C jobs that leave the system = = {count_C}")
+
+    # Collect and return the results
+    return {
+        'edge_avg_wait': area_edge.node / index_edge if index_edge > 0 else 0,
+        'edge_avg_delay': area_edge.queue / index_edge if index_edge > 0 else 0,
+        'edge_avg_service_time': area_edge.service / index_edge if index_edge > 0 else 0,
+        'edge_utilization': area_edge.service / t.current if t.current > 0 else 0,
+        'cloud_avg_wait': area_cloud.node / index_cloud if index_cloud > 0 else 0,
+        'cloud_avg_delay': area_cloud.queue / index_cloud if index_cloud > 0 else 0,
+        'cloud_avg_service_time': area_cloud.service / index_cloud if index_cloud > 0 else 0,
+        'cloud_utilization': area_cloud.service / t.current if t.current > 0 else 0,
+        'count_E': count_E,
+        'count_C': count_C
+    }

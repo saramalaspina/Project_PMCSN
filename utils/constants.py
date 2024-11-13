@@ -6,15 +6,7 @@ EDGE_SERVERS = 1
 
 P_C = 0.4
 
-# Seeds per la generazione casuale
-seeds = {
-    "1": 324516786,
-    "2": 140620017,
-    "3": 170920015,
-    "4": 170520018
-}
-SEED = seeds["1"]
-SEED_INDEX = list(seeds.keys())[list(seeds.values()).index(SEED)]
+SEED = 123456789
 
 REPLICATIONS = 2
 
