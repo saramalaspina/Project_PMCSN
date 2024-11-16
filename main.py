@@ -1,6 +1,8 @@
+from simulation.sim_utils import calculate_confidence_interval
 from simulation.simulator import finite_simulation
 from utils.constants import *
 import statistics
+
 
 # Variabili per raccogliere statistiche globali
 edge_wait_times = []
@@ -42,16 +44,16 @@ def start_finite_simulation():
 
     # Calcolo delle medie e deviazioni standard delle replicazioni
     print(f"\nStatistiche dopo {REPLICATIONS} replicazioni:")
-    print(f"Edge Node - Tempo medio di attesa: {statistics.mean(edge_wait_times):.2f} ± {statistics.stdev(edge_wait_times):.2f}")
-    print(f"Edge Node - Tempo medio di ritardo: {statistics.mean(edge_delays):.2f} ± {statistics.stdev(edge_delays):.2f}")
-    print(f"Edge Node - Tempo medio di servizio: {statistics.mean(edge_service_times):.2f} ± {statistics.stdev(edge_service_times):.2f}")
-    print(f"Edge Node - Utilizzo: {statistics.mean(edge_utilizations):.2f} ± {statistics.stdev(edge_utilizations):.2f}")
-    print(f"Cloud Server - Tempo medio di attesa: {statistics.mean(cloud_wait_times):.2f} ± {statistics.stdev(cloud_wait_times):.2f}")
-    print(f"Cloud Server - Tempo medio di ritardo: {statistics.mean(cloud_delays):.2f} ± {statistics.stdev(cloud_delays):.2f}")
-    print(f"Cloud Server - Tempo medio di servizio: {statistics.mean(cloud_service_times):.2f} ± {statistics.stdev(cloud_service_times):.2f}")
-    print(f"Cloud Server - Utilizzo: {statistics.mean(cloud_utilizations):.2f} ± {statistics.stdev(cloud_utilizations):.2f}")
-    print(f"Media E jobs leaving: {statistics.mean(E_jobs_leaving):.2f} ± {statistics.stdev(E_jobs_leaving):.2f}")
-    print(f"Media C jobs leaving: {statistics.mean(C_jobs_leaving):.2f} ± {statistics.stdev(C_jobs_leaving):.2f}")
+    print(f"Edge Node - Tempo medio di attesa: {statistics.mean(edge_wait_times):.2f} ± {calculate_confidence_interval(edge_wait_times):.2f}")
+    print(f"Edge Node - Tempo medio di ritardo: {statistics.mean(edge_delays):.2f} ± {calculate_confidence_interval(edge_delays):.2f}")
+    print(f"Edge Node - Tempo medio di servizio: {statistics.mean(edge_service_times):.2f} ± {calculate_confidence_interval(edge_service_times):.2f}")
+    print(f"Edge Node - Utilizzo: {statistics.mean(edge_utilizations):.2f} ± {calculate_confidence_interval(edge_utilizations):.2f}")
+    print(f"Cloud Server - Tempo medio di attesa: {statistics.mean(cloud_wait_times):.2f} ± {calculate_confidence_interval(cloud_wait_times):.2f}")
+    print(f"Cloud Server - Tempo medio di ritardo: {statistics.mean(cloud_delays):.2f} ± {calculate_confidence_interval(cloud_delays):.2f}")
+    print(f"Cloud Server - Tempo medio di servizio: {statistics.mean(cloud_service_times):.2f} ± {calculate_confidence_interval(cloud_service_times):.2f}")
+    print(f"Cloud Server - Utilizzo: {statistics.mean(cloud_utilizations):.2f} ± {calculate_confidence_interval(cloud_utilizations):.2f}")
+    print(f"Media E jobs leaving: {statistics.mean(E_jobs_leaving):.2f} ± {calculate_confidence_interval(E_jobs_leaving):.2f}")
+    print(f"Media C jobs leaving: {statistics.mean(C_jobs_leaving):.2f} ± {calculate_confidence_interval(C_jobs_leaving):.2f}")
 
 start_simulation()
 
