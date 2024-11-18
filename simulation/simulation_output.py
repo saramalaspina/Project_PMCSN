@@ -1,3 +1,8 @@
+import statistics
+from simulation.sim_utils import calculate_confidence_interval
+from utils.constants import REPLICATIONS
+
+
 def print_edge_stats(stats):
     print(f"\nFor {stats.index_edge} jobs processed by edge node (first and second pass):")
     print(f"   Average wait ............ = {stats.area_edge.node / stats.index_edge:.2f}")
@@ -47,3 +52,35 @@ def print_all_stats(stats):
     print_type_E_stats(stats)
     print_type_C_stats(stats)
     print_job_counts(stats)
+
+def print_replication_stats(stats):
+    print(f"\nStats after {REPLICATIONS} replications:")
+    print( f"Edge Node - Average wait time: {statistics.mean(stats.edge_wait_times):.2f} ± {calculate_confidence_interval(stats.edge_wait_times):.2f}")
+    print(f"Edge Node - Average delay time: {statistics.mean(stats.edge_delays):.2f} ± {calculate_confidence_interval(stats.edge_delays):.2f}")
+    print(f"Edge Node - Average service time: {statistics.mean(stats.edge_service_times):.2f} ± {calculate_confidence_interval(stats.edge_service_times):.2f}")
+    print(f"Edge Node - Utilization: {statistics.mean(stats.edge_utilization):.2f} ± {calculate_confidence_interval(stats.edge_utilization):.2f}")
+    print(f"Edge Node - Average number in the node: {statistics.mean(stats.edge_number_node):.2f} ± {calculate_confidence_interval(stats.edge_number_node):.2f}")
+    print(f"Edge Node - Average number in the queue: {statistics.mean(stats.edge_number_queue):.2f} ± {calculate_confidence_interval(stats.edge_number_queue):.2f}")
+
+    print(f"\nCloud Server - Average wait time: {statistics.mean(stats.cloud_wait_times):.2f} ± {calculate_confidence_interval(stats.cloud_wait_times):.2f}")
+    print(f"Cloud Server - Average delay time: {statistics.mean(stats.cloud_delays):.2f} ± {calculate_confidence_interval(stats.cloud_delays):.2f}")
+    print(f"Cloud Server - Average service time: {statistics.mean(stats.cloud_service_times):.2f} ± {calculate_confidence_interval(stats.cloud_service_times):.2f}")
+    print(f"Cloud Server - Utilization: {statistics.mean(stats.cloud_utilization):.2f} ± {calculate_confidence_interval(stats.cloud_utilization):.2f}")
+    print(f"Cloud Node - Average number in the node: {statistics.mean(stats.cloud_number_node):.2f} ± {calculate_confidence_interval(stats.cloud_number_node):.2f}")
+    print(f"Cloud Node - Average number in the queue: {statistics.mean(stats.cloud_number_queue):.2f} ± {calculate_confidence_interval(stats.cloud_number_queue):.2f}")
+
+    print(f"\nMean E jobs leaving: {statistics.mean(stats.E_jobs_leaving):.2f} ± {calculate_confidence_interval(stats.E_jobs_leaving):.2f}")
+    print(f"Average wait time for E jobs: {statistics.mean(stats.E_edge_wait_times):.2f} ± {calculate_confidence_interval(stats.E_edge_wait_times):.2f}")
+    print(f"Average delay time for E jobs: {statistics.mean(stats.E_edge_delays):.2f} ± {calculate_confidence_interval(stats.E_edge_delays):.2f}")
+    print(f"Average service time for E jobs: {statistics.mean(stats.E_edge_service_times):.2f} ± {calculate_confidence_interval(stats.E_edge_service_times):.2f}")
+    print(f"Utilization for E jobs: {statistics.mean(stats.E_edge_utilization):.2f} ± {calculate_confidence_interval(stats.E_edge_utilization):.2f}")
+    print(f"Average number of E jobs in the node (edge): {statistics.mean(stats.E_edge_number_node):.2f} ± {calculate_confidence_interval(stats.E_edge_number_node):.2f}")
+    print(f"Average number of E in the (edge) queue: {statistics.mean(stats.E_edge_number_queue):.2f} ± {calculate_confidence_interval(stats.E_edge_number_queue):.2f}")
+
+    print(f"\nMean C jobs leaving: {statistics.mean(stats.C_jobs_leaving):.2f} ± {calculate_confidence_interval(stats.C_jobs_leaving):.2f}")
+    print(f"Average wait time for C jobs: {statistics.mean(stats.C_edge_wait_times):.2f} ± {calculate_confidence_interval(stats.C_edge_wait_times):.2f}")
+    print(f"Average delay time for C jobs: {statistics.mean(stats.C_edge_delays):.2f} ± {calculate_confidence_interval(stats.C_edge_delays):.2f}")
+    print(f"Average service time for C jobs: {statistics.mean(stats.C_edge_service_times):.2f} ± {calculate_confidence_interval(stats.C_edge_service_times):.2f}")
+    print(f"Utilization for C jobs: {statistics.mean(stats.C_edge_utilization):.2f} ± {calculate_confidence_interval(stats.C_edge_utilization):.2f}")
+    print(f"Average number of C jobs in the node (edge/cloud): {statistics.mean(stats.C_edge_number_node):.2f} ± {calculate_confidence_interval(stats.C_edge_number_node):.2f}")
+    print(f"Average number of C in the (cloud) queue: {statistics.mean(stats.C_edge_number_queue):.2f} ± {calculate_confidence_interval(stats.C_edge_number_queue):.2f}")

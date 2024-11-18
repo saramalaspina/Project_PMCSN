@@ -108,7 +108,7 @@ def finite_simulation():
     # EndWhile
 
     # Output the statistics for edge node and cloud server
-    print_all_stats(stats)
+    #print_all_stats(stats)
 
     # Collect and return the results
     return {

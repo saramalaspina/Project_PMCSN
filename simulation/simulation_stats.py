@@ -13,6 +13,7 @@ class Time:
         self.current = -1  # current time
         self.next = -1  # next (most imminent) event time
         self.last = -1  # last arrival time
+
 class SimulationStats:
     def __init__(self):
 
@@ -46,3 +47,40 @@ class SimulationStats:
         self.t.completion_edge = float('inf')
         self.t.completion_cloud = float('inf')
         self.queue_edge.clear()  # Svuota la coda
+
+class ReplicationStats:
+    def __init__(self):
+        self.edge_wait_times = []
+        self.edge_delays = []
+        self.edge_service_times = []
+        self.edge_utilization = []
+        self.edge_number_node = []
+        self.edge_number_queue = []
+
+        # lists for cloud stats
+        self.cloud_wait_times = []
+        self.cloud_delays = []
+        self.cloud_service_times = []
+        self.cloud_utilization = []
+        self.cloud_number_node = []
+        self.cloud_number_queue = []
+
+        # lists for E type job stats
+        self.E_jobs_leaving = []
+        self.E_edge_wait_times = []
+        self.E_edge_delays = []
+        self.E_edge_service_times = []
+        self.E_edge_utilization = []
+        self.E_edge_number_node = []
+        self.E_edge_number_queue = []
+
+        # lists for C type job stats
+        self.C_jobs_leaving = []
+        self.C_edge_wait_times = []
+        self.C_edge_delays = []
+        self.C_edge_service_times = []
+        self.C_edge_utilization = []
+        self.C_edge_number_node = []
+        self.C_edge_number_queue = []
+
+
