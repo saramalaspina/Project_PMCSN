@@ -1,4 +1,5 @@
-from simulation.simulation_output import print_replication_stats
+from simulation.priority_simulator import better_finite_simulation
+from simulation.simulation_output import print_replication_stats, write_file, clear_file
 from simulation.simulation_stats import ReplicationStats
 from simulation.simulator import finite_simulation
 from utils.constants import *
@@ -16,8 +17,20 @@ def start_simulation():
 def start_finite_simulation():
     replicationStats = ReplicationStats()
 
+    if MODEL == STANDARD:
+        file_name = "finite_statistics.csv"
+    else:
+        file_name = "better_finite_statistics.csv"
+
+    clear_file(file_name)
+
     for i in range(REPLICATIONS):
-        results = finite_simulation()
+        if MODEL == STANDARD:
+            results = finite_simulation()
+        else:
+            results = better_finite_simulation()
+
+        write_file(results, file_name)
 
         # append stats in the list
         replicationStats.edge_wait_times.append(results['edge_avg_wait'])

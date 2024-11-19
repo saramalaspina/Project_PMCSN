@@ -16,7 +16,6 @@ plantSeeds(SEED) #la faccio nel main
 
 def finite_simulation():
     s = getSeed()
-    print(s)
     reset_arrival_temp()
 
     stats = SimulationStats()  # init class
@@ -112,6 +111,7 @@ def finite_simulation():
 
     # Collect and return the results
     return {
+        'seed': s,
         'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
         'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
         'edge_avg_service_time': stats.area_edge.service / stats.index_edge if stats.index_edge > 0 else 0,
