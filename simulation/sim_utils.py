@@ -83,6 +83,37 @@ def calculate_confidence_interval(data):
 
     return margin_of_error
 
+def append_stats(replicationStats, results):
+    # append stats in the list
+    replicationStats.edge_wait_times.append(results['edge_avg_wait'])
+    replicationStats.edge_delays.append(results['edge_avg_delay'])
+    replicationStats.edge_service_times.append(results['edge_avg_service_time'])
+    replicationStats.edge_utilization.append(results['edge_utilization'])
+    replicationStats.edge_number_node.append(results['edge_avg_number_node'])
+    replicationStats.edge_number_queue.append(results['edge_avg_number_queue'])
+
+    replicationStats.cloud_wait_times.append(results['cloud_avg_wait'])
+    replicationStats.cloud_delays.append(results['cloud_avg_delay'])
+    replicationStats.cloud_service_times.append(results['cloud_avg_service_time'])
+    replicationStats.cloud_utilization.append(results['cloud_utilization'])
+    replicationStats.cloud_number_node.append(results['cloud_avg_number_node'])
+    replicationStats.cloud_number_queue.append(results['cloud_avg_number_queue'])
+
+    replicationStats.E_jobs_leaving.append(results['count_E'])
+    replicationStats.E_edge_wait_times.append(results['E_avg_wait'])
+    replicationStats.E_edge_delays.append(results['E_avg_delay'])
+    replicationStats.E_edge_service_times.append(results['E_avg_service_time'])
+    replicationStats.E_edge_utilization.append(results['E_utilization'])
+    replicationStats.E_edge_number_node.append(results['E_avg_number_edge'])
+    replicationStats.E_edge_number_queue.append(results['E_avg_number_queue_edge'])
+
+    replicationStats.C_jobs_leaving.append(results['count_C'])
+    replicationStats.C_edge_wait_times.append(results['C_avg_wait'])
+    replicationStats.C_edge_delays.append(results['C_avg_delay'])
+    replicationStats.C_edge_service_times.append(results['C_avg_service_time'])
+    replicationStats.C_edge_utilization.append(results['C_utilization'])
+    replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
+    replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
 
 
 

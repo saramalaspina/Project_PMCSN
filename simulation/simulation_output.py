@@ -2,7 +2,7 @@ import statistics
 import os
 import csv
 from simulation.sim_utils import calculate_confidence_interval
-from utils.constants import REPLICATIONS
+from utils.constants import *
 
 file_path = "simulation/../output/"
 header = ["seed", "edge_avg_wait", "edge_avg_delay", "edge_avg_service_time", "edge_utilization",
@@ -63,8 +63,12 @@ def print_all_stats(stats):
     print_type_C_stats(stats)
     print_job_counts(stats)
 
-def print_replication_stats(stats):
-    print(f"\nStats after {REPLICATIONS} replications:")
+def print_simulation_stats(stats, type):
+    if type == "replications":
+        print(f"\nStats after {REPLICATIONS} replications:")
+    elif type == "batch":
+        print(f"\nStats for {K} batch:")
+
     print( f"Edge Node - Average wait time: {statistics.mean(stats.edge_wait_times):.2f} ± {calculate_confidence_interval(stats.edge_wait_times):.2f}")
     print(f"Edge Node - Average delay time: {statistics.mean(stats.edge_delays):.2f} ± {calculate_confidence_interval(stats.edge_delays):.2f}")
     print(f"Edge Node - Average service time: {statistics.mean(stats.edge_service_times):.2f} ± {calculate_confidence_interval(stats.edge_service_times):.2f}")

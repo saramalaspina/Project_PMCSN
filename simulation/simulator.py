@@ -3,7 +3,7 @@ from libraries.rngs import * # Multi-stream generator
 from simulation.sim_utils import*
 from simulation.simulation_output import print_all_stats
 from utils.constants import*
-from simulation.simulation_stats import SimulationStats, ReplicationStats
+from simulation.simulation_stats import*
 
 plantSeeds(SEED) #la faccio nel main
 
@@ -23,51 +23,31 @@ def finite_simulation():
     while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
         execute(stats)
     # Collect and return the results
-    return {
-        'seed': s,
-        'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_service_time': stats.area_edge.service / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_utilization': stats.area_edge.service / stats.t.current if stats.t.current > 0 else 0,
-        'edge_avg_number_node': stats.area_edge.node / stats.t.current if stats.t.current > 0 else 0,
-        'edge_avg_number_queue': stats.area_edge.queue / stats.t.current if stats.t.current > 0 else 0,
-
-        'cloud_avg_wait': stats.area_cloud.node / stats.index_cloud if stats.index_cloud > 0 else 0,
-        'cloud_avg_delay': stats.area_cloud.queue / stats.index_cloud if stats.index_cloud > 0 else 0,
-        'cloud_avg_service_time': stats.area_cloud.service / stats.index_cloud if stats.index_cloud > 0 else 0,
-        'cloud_utilization': stats.area_cloud.service / stats.t.current if stats.t.current > 0 else 0,
-        'cloud_avg_number_node': stats.area_cloud.node / stats.t.current if stats.t.current > 0 else 0,
-        'cloud_avg_number_queue': stats.area_cloud.queue / stats.t.current if stats.t.current > 0 else 0,
-
-        'count_E': stats.count_E,
-        'E_avg_wait': stats.area_E.node / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_service_time': stats.area_E.service / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
-        'E_avg_number_queue_edge': stats.area_E.queue / stats.t.current if stats.t.current > 0 else 0,
-        'E_utilization': stats.area_E.service / stats.t.current if stats.t.current > 0 else 0,
-
-        'count_C': stats.count_C,
-        'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_service_time': stats.area_C.service / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
-        'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
-        'C_utilization': stats.area_C.service / stats.t.current if stats.t.current > 0 else 0
-    }
+    return return_stats(stats, stats.t.current, s)
 
 
 def infinite_simulation(B, K):
     s = getSeed()
 
-    batchStats = ReplicationStats()
+    start_time = 0
+
+    batch_stats = ReplicationStats()
     stats = SimulationStats()
 
-    while(len(batchStats.edge_wait_times) < K):
-        execute(stats)
+    while len(batch_stats.edge_wait_times) < K:
 
+        while stats.job_arrived < B:
+            execute(stats)
+        stop_time = stats.t.current - start_time
+        start_time = stats.t.current
+        results = return_stats(stats, stop_time, s)
+        append_stats(batch_stats, results)
+        stats.reset_infinite()
 
-    return results
+    return batch_stats
+
+def infinite_better_simulation(B, K):
+    print("da fare") # da fare
 
 
 def execute(stats):
@@ -153,7 +133,39 @@ def execute(stats):
         if stats.number_edge == 1:  # If edge node is idle, start service
             stats.t.completion_edge = stats.t.current + GetServiceEdgeC()
 
+def return_stats(stats, t, s):
+    return {
+        'seed': s,
+        'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
+        'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
+        'edge_avg_service_time': stats.area_edge.service / stats.index_edge if stats.index_edge > 0 else 0,
+        'edge_utilization': stats.area_edge.service / t if t > 0 else 0,
+        'edge_avg_number_node': stats.area_edge.node / t if t > 0 else 0,
+        'edge_avg_number_queue': stats.area_edge.queue / t if t > 0 else 0,
 
+        'cloud_avg_wait': stats.area_cloud.node / stats.index_cloud if stats.index_cloud > 0 else 0,
+        'cloud_avg_delay': stats.area_cloud.queue / stats.index_cloud if stats.index_cloud > 0 else 0,
+        'cloud_avg_service_time': stats.area_cloud.service / stats.index_cloud if stats.index_cloud > 0 else 0,
+        'cloud_utilization': stats.area_cloud.service / t if t > 0 else 0,
+        'cloud_avg_number_node': stats.area_cloud.node / t if t > 0 else 0,
+        'cloud_avg_number_queue': stats.area_cloud.queue / t if t > 0 else 0,
+
+        'count_E': stats.count_E,
+        'E_avg_wait': stats.area_E.node / stats.index_E if stats.index_E > 0 else 0,
+        'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
+        'E_avg_service_time': stats.area_E.service / stats.index_E if stats.index_E > 0 else 0,
+        'E_avg_number_edge': stats.area_E.node / t if t > 0 else 0,
+        'E_avg_number_queue_edge': stats.area_E.queue / t if t > 0 else 0,
+        'E_utilization': stats.area_E.service / t if t > 0 else 0,
+
+        'count_C': stats.count_C,
+        'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_service_time': stats.area_C.service / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_number_edge': stats.area_C.node / t if t > 0 else 0,
+        'C_avg_number_queue_edge': stats.area_C.queue / t if t > 0 else 0,
+        'C_utilization': stats.area_C.service / t if t > 0 else 0
+    }
 
 
 

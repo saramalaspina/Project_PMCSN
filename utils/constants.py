@@ -4,7 +4,7 @@ MEAN_ARRIVAL_TIME = 1.4  # Tempo medio di arrivo dei job [secondo/job]
 
 EDGE_SERVERS = 1
 
-P_C = 0
+P_C = 0.4
 
 SEED = 123456789
 
@@ -12,7 +12,7 @@ REPLICATIONS = 10
 
 INFINITE = 0
 FINITE = 1
-SIMULATION_TYPE = FINITE
+SIMULATION_TYPE = INFINITE
 
 BETTER = 0
 STANDARD = 1
@@ -24,5 +24,5 @@ INFINITY = (100.0 * STOP)  # must be much larger than STOP
 
 ALPHA = 0.05 # 95% confidence
 
-K = 0
-B = 0
+K = 1080
+B = 96

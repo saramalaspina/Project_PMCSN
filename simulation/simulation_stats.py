@@ -60,15 +60,10 @@ class SimulationStats:
         self.index_E = 0  # number of type E processed jobs in edge node
         self.index_C = 0  # number of type C processed jobs in edge node
 
-        # Tracciamento delle aree per statistiche
         self.area_edge = Track()  # stats tracking for server 1
         self.area_cloud = Track()  # stats tracking for server 2
         self.area_E = Track()  # stats tracking job of type E
         self.area_C = Track()  # stats tracking job of type C in edge node
-
-        # Variabile per i tempi
-        self.t = Time()
-        self.queue_edge = []  # A list to track the type of jobs waiting at the edge node
 
 
 class ReplicationStats:

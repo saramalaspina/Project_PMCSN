@@ -1,14 +1,15 @@
 from simulation.priority_simulator import better_finite_simulation
-from simulation.simulation_output import print_replication_stats, write_file, clear_file
+from simulation.simulation_output import print_simulation_stats, write_file, clear_file
 from simulation.simulation_stats import ReplicationStats
-from simulation.simulator import finite_simulation
+from simulation.simulator import *
 from utils.constants import *
+from simulation.sim_utils import *
 
 def start_simulation():
     if SIMULATION_TYPE == FINITE:
         start_finite_simulation()
     elif SIMULATION_TYPE == INFINITE:
-        print("TODO")
+        start_infinite_simulation()
     else:
         print("TYPE not valid!")
         exit(1)
@@ -32,38 +33,26 @@ def start_finite_simulation():
 
         write_file(results, file_name)
 
-        # append stats in the list
-        replicationStats.edge_wait_times.append(results['edge_avg_wait'])
-        replicationStats.edge_delays.append(results['edge_avg_delay'])
-        replicationStats.edge_service_times.append(results['edge_avg_service_time'])
-        replicationStats.edge_utilization.append(results['edge_utilization'])
-        replicationStats.edge_number_node.append(results['edge_avg_number_node'])
-        replicationStats.edge_number_queue.append(results['edge_avg_number_queue'])
+        append_stats(replicationStats, results)
 
-        replicationStats.cloud_wait_times.append(results['cloud_avg_wait'])
-        replicationStats.cloud_delays.append(results['cloud_avg_delay'])
-        replicationStats.cloud_service_times.append(results['cloud_avg_service_time'])
-        replicationStats.cloud_utilization.append(results['cloud_utilization'])
-        replicationStats.cloud_number_node.append(results['cloud_avg_number_node'])
-        replicationStats.cloud_number_queue.append(results['cloud_avg_number_queue'])
+    type = "replications"
+    print_simulation_stats(replicationStats, type)
 
-        replicationStats.E_jobs_leaving.append(results['count_E'])
-        replicationStats.E_edge_wait_times.append(results['E_avg_wait'])
-        replicationStats.E_edge_delays.append(results['E_avg_delay'])
-        replicationStats.E_edge_service_times.append(results['E_avg_service_time'])
-        replicationStats.E_edge_utilization.append(results['E_utilization'])
-        replicationStats.E_edge_number_node.append(results['E_avg_number_edge'])
-        replicationStats.E_edge_number_queue.append(results['E_avg_number_queue_edge'])
+def start_infinite_simulation():
+    if MODEL == STANDARD:
+        file_name = "infinite_statistics.csv"
+    else:
+        file_name = "better_infinite_statistics.csv"
 
-        replicationStats.C_jobs_leaving.append(results['count_C'])
-        replicationStats.C_edge_wait_times.append(results['C_avg_wait'])
-        replicationStats.C_edge_delays.append(results['C_avg_delay'])
-        replicationStats.C_edge_service_times.append(results['C_avg_service_time'])
-        replicationStats.C_edge_utilization.append(results['C_utilization'])
-        replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
-        replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
+    clear_file(file_name)
 
-    print_replication_stats(replicationStats)
+    if MODEL == STANDARD:
+        batch_stats = infinite_simulation(B, K)
+    else:
+        print("da fare") # better_infinite_simulation(B, K)
+
+    type = "batch"
+    print_simulation_stats(batch_stats, type)
 
 start_simulation()
 
