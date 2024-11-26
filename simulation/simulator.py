@@ -1,7 +1,7 @@
 from math import log
 from libraries.rngs import * # Multi-stream generator
 from simulation.sim_utils import*
-from simulation.simulation_output import print_all_stats
+from simulation.simulation_output import *
 from utils.constants import*
 from simulation.simulation_stats import*
 
@@ -41,6 +41,7 @@ def infinite_simulation(B, K):
         stop_time = stats.t.current - start_time
         start_time = stats.t.current
         results = return_stats(stats, stop_time, s)
+        write_file(results, "infinite_statistics.csv")
         append_stats(batch_stats, results)
         stats.reset_infinite()
 
