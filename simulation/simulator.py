@@ -21,7 +21,7 @@ def finite_simulation():
     stats.reset(START)  # reset stats
 
     while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
-        execute(stats)
+        execute(stats, STOP)
     # Collect and return the results
     return return_stats(stats, stats.t.current, s)
 
@@ -37,7 +37,7 @@ def infinite_simulation(B, K):
     while len(batch_stats.edge_wait_times) < K:
 
         while stats.job_arrived < B:
-            execute(stats)
+            execute(stats, STOP_INFINITE)
         stop_time = stats.t.current - start_time
         start_time = stats.t.current
         results = return_stats(stats, stop_time, s)
@@ -50,7 +50,7 @@ def infinite_better_simulation(B, K):
     print("da fare") # da fare
 
 
-def execute(stats):
+def execute(stats, stop):
     stats.t.next = Min(stats.t.arrival, stats.t.completion_edge, stats.t.completion_cloud)  # next event time   */
 
     if (stats.number_edge > 0): # update integrals  */
@@ -85,7 +85,7 @@ def execute(stats):
         stats.number_E += 1
         stats.queue_edge.append("E")
         stats.t.arrival = GetArrival()
-        if (stats.t.arrival > STOP):
+        if (stats.t.arrival > stop):
             stats.t.last = stats.t.current
             stats.t.arrival = INFINITY
 

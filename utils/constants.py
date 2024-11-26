@@ -1,5 +1,3 @@
-INF = float('inf')
-
 MEAN_ARRIVAL_TIME = 1.4  # Tempo medio di arrivo dei job [secondo/job]
 
 EDGE_SERVERS = 1
@@ -19,10 +17,11 @@ STANDARD = 1
 MODEL = STANDARD
 
 START = 0.0  # initial time
-STOP = 86400.0  # terminal (close the door) time
-INFINITY = (100.0 * STOP)  # must be much larger than STOP
+STOP = 86400.00  # terminal (close the door) time
+STOP_INFINITE = float('inf')
+INFINITY = float('inf')  # must be much larger than STOP
 
 ALPHA = 0.05 # 95% confidence
 
-K = 1080
-B = 96
+K = 260
+B = 1096
