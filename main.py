@@ -1,9 +1,7 @@
-from simulation.priority_simulator import*
-from simulation.simulation_output import print_simulation_stats, write_file, clear_file
-from simulation.simulation_stats import ReplicationStats
+from simulation.priority_scalability_simulator import better_scalability_simulation
+from simulation.priority_simulator import *
 from simulation.simulator import *
-from utils.constants import *
-from simulation.sim_utils import *
+
 
 def start_simulation():
     if SIMULATION_TYPE == FINITE:
@@ -20,16 +18,24 @@ def start_finite_simulation():
 
     if MODEL == STANDARD:
         file_name = "finite_statistics.csv"
-    else:
+        print("FINITE STANDARD SIMULATION")
+    elif MODEL == BETTER:
         file_name = "better_finite_statistics.csv"
+        print("FINITE BETTER SIMULATION")
+    else:
+        file_name = "better_scalability_statistics.csv"
+        print("FINITE BETTER SCALABILITY SIMULATION")
+
 
     clear_file(file_name)
 
     for i in range(REPLICATIONS):
         if MODEL == STANDARD:
             results = finite_simulation()
-        else:
+        elif MODEL == BETTER:
             results = better_finite_simulation()
+        else:
+            results = better_scalability_simulation()
 
         write_file(results, file_name)
 
@@ -48,8 +54,10 @@ def start_infinite_simulation():
 
     if MODEL == STANDARD:
         batch_stats = infinite_simulation(B, K)
+        print("FINITE STANDARD SIMULATION")
     else:
         batch_stats = better_infinite_simulation(B, K)
+        print("FINITE BETTER SIMULATION")
 
     type = "batch"
     print_simulation_stats(batch_stats, type)

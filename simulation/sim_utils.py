@@ -83,6 +83,32 @@ def calculate_confidence_interval(data):
 
     return margin_of_error
 
+def NextEvent(events):
+    i = 0
+    while events[i].x == 0:  # find the index of the first 'active' */
+        i += 1  # element in the event list            */
+    # EndWhile
+    e = i
+    while i < EDGE_SERVERS + CLOUD_SERVERS:  # now, check the others to find which  */
+        i += 1  # event type is most imminent          */
+        if (events[i].x == 1) and (events[i].t < events[e].t):
+            e = i
+    # EndWhile
+    return (e)
+
+
+def FindOne(events, servers, i):
+    while events[i].x == 1:  # find the index of the first available */
+        i += 1  # (idle) server                         */
+    # EndWhile
+    s = i
+    while i < servers:  # now, check the others to find which   */
+        i += 1  # has been idle longest                 */
+        if (events[i].x == 0) and (events[i].t < events[s].t):
+            s = i
+    # EndWhile
+    return (s)
+
 def append_stats(replicationStats, results):
     # append stats in the list
     replicationStats.edge_wait_times.append(results['edge_avg_wait'])

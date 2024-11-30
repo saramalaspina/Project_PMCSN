@@ -43,7 +43,6 @@ class SimulationStats:
         self.queue_edge = [] # A list to track the type of jobs waiting at the edge node
 
     def reset(self, start_time):
-        self.arrivalTemp = start_time
         self.t.current = start_time
         self.t.completion_edge = float('inf')
         self.t.completion_cloud = float('inf')

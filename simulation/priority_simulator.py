@@ -1,9 +1,7 @@
-from math import log
-from libraries.rngs import plantSeeds, random, selectStream, getSeed  # Multi-stream generator
-from simulation.simulation_output import*
-from utils.constants import*
+from libraries.rngs import plantSeeds, getSeed  # Multi-stream generator
 from simulation.simulation_stats import*
 from simulation.sim_utils import*
+from simulation.simulation_output import*
 
 in_service = None # tracking type of job in service
 
