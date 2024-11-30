@@ -1,4 +1,4 @@
-from simulation.priority_simulator import better_finite_simulation
+from simulation.priority_simulator import*
 from simulation.simulation_output import print_simulation_stats, write_file, clear_file
 from simulation.simulation_stats import ReplicationStats
 from simulation.simulator import *
@@ -49,7 +49,7 @@ def start_infinite_simulation():
     if MODEL == STANDARD:
         batch_stats = infinite_simulation(B, K)
     else:
-        print("da fare") # better_infinite_simulation(B, K)
+        batch_stats = better_infinite_simulation(B, K)
 
     type = "batch"
     print_simulation_stats(batch_stats, type)

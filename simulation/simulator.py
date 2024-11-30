@@ -47,10 +47,6 @@ def infinite_simulation(B, K):
 
     return batch_stats
 
-def infinite_better_simulation(B, K):
-    print("da fare") # da fare
-
-
 def execute(stats, stop):
     stats.t.next = Min(stats.t.arrival, stats.t.completion_edge, stats.t.completion_cloud)  # next event time   */
 
