@@ -86,6 +86,7 @@ def better_scalability_simulation():
             if (stats.number_edge <= EDGE_SERVERS):
                 service = GetServiceEdgeE()
                 s = FindOne(events, EDGE_SERVERS, 1)
+               # print(f"arrival - edge trovato: {s}")
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
@@ -103,7 +104,8 @@ def better_scalability_simulation():
                     stats.number_cloud += 1
                     if stats.number_cloud <= CLOUD_SERVERS:
                         service = GetServiceCloud()
-                        s = FindOne(events, CLOUD_SERVERS, EDGE_SERVERS + 1)
+                        s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
+                       # print(f"completion edge - cloud trovato: {s}")
                         sum[s].service += service
                         sum[s].served += 1
                         events[s].t = stats.t.current + service
@@ -118,42 +120,43 @@ def better_scalability_simulation():
 
             stats.index_edge += 1
             stats.number_edge -= 1
-            if stats.number_edge > 0:
+            s = e
+            if stats.number_edge >= EDGE_SERVERS:
                 if stats.queue_edge_E:
                     service = GetServiceEdgeE()
-                    events[e].type = "E"
+                    events[s].type = "E"
                     stats.queue_edge_E -= 1
                 else:
                     service = GetServiceEdgeC()
-                    events[e].type = "C"
+                    events[s].type = "C"
                     stats.queue_edge_C -= 1
-                sum[e].service += service
-                sum[e].served += 1
-                events[e].t = stats.t.current + service
-                events[e].x = 1
+                sum[s].service += service
+                sum[s].served += 1
+                events[s].t = stats.t.current + service
             else:
-                events[e].x = 0
+                events[s].x = 0
 
         elif EDGE_SERVERS + 1 <= e <= CLOUD_SERVERS + EDGE_SERVERS: # completion at cloud server
             stats.index_cloud += 1
             stats.number_cloud -= 1
-            if stats.number_cloud > 0:
+            s = e
+            if stats.number_cloud >= CLOUD_SERVERS:
                 service = GetServiceCloud()
-                sum[e].service += service
-                sum[e].served += 1
-                events[e].t = stats.t.current + service
-                events[e].x = 1
-                events[e].type = "C"
+                sum[s].service += service
+                sum[s].served += 1
+                events[s].t = stats.t.current + service
+                events[s].type = "C"
             else:
-                events[e].x = 0
+                events[s].x = 0
 
             stats.number_edge += 1
             stats.number_C += 1
             stats.queue_edge_C += 1
 
-            if (stats.number_edge <= EDGE_SERVERS):
+            if stats.number_edge <= EDGE_SERVERS:
                 service = GetServiceEdgeC()
                 s = FindOne(events, EDGE_SERVERS, 1)
+               # print(f"completion cloud - edge trovato: {s}")
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service

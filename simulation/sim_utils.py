@@ -99,7 +99,7 @@ def NextEvent(events):
 
 def FindOne(events, servers, i):
     while events[i].x == 1:  # find the index of the first available */
-        i += 1  # (idle) server                         */
+        i += 1  # (idle) server
     # EndWhile
     s = i
     while i < servers:  # now, check the others to find which   */

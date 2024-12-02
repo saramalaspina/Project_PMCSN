@@ -164,7 +164,7 @@ while ((events[0].x != 0) or (number != 0)):
   else:                                          # process a departure */
     index += 1                                     # from server s       */  
     number -= 1
-    s = e                       
+    s = e
     if (number >= SERVERS): 
       service   = GetService()
       sum[s].service += service
