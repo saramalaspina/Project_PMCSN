@@ -17,15 +17,6 @@ service_rates = {
     'cloud_server': 0.8
 }
 
-def get_next_arrival_time(mean_arrival_time):
-    rngs.selectStream(0)
-    return rvms.idfExponential(mean_arrival_time, rngs.random())
-
-def get_service_time(stream):
-    rngs.selectStream(streams[stream])
-    service_time = rvms.idfExponential(service_rates[stream], rngs.random())
-    return service_time
-
 def Min(a, b, c):
     """Return the smallest of a, b, c."""
     return min(a, b, c)

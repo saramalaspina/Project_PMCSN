@@ -21,8 +21,7 @@ class accumSum:
     service = None  # service times                    */
     served = None  # number served                    */
 
-
-def better_scalability_simulation():
+def scalability_simulation():
     seed = getSeed()
     reset_arrival_temp()
 
@@ -75,8 +74,7 @@ def better_scalability_simulation():
         if (e == 0):  # process an arrival*/
             stats.number_edge += 1
             stats.number_E += 1
-            stats.queue_edge_E += 1
-
+            stats.queue_edge.append("E")
             events[0].t = GetArrival()
             if (events[0].t > STOP):
                 events[0].x = 0
@@ -85,16 +83,15 @@ def better_scalability_simulation():
             if (stats.number_edge <= EDGE_SERVERS):
                 service = GetServiceEdgeE()
                 s = FindOne(events, EDGE_SERVERS, 1)
-               # print(f"arrival - edge trovato: {s}")
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
                 events[s].x = 1
                 events[s].type = "E"
-                stats.queue_edge_E -= 1
+                stats.queue_edge.pop(0)
             # EndIf
         # EndIf
-        elif 1 <= e <= EDGE_SERVERS: # completion at edge node
+        elif 1 <= e <= EDGE_SERVERS:  # completion at edge node
             if events[e].type == "E":
                 stats.number_E -= 1
                 stats.index_E += 1
@@ -104,7 +101,7 @@ def better_scalability_simulation():
                     if stats.number_cloud <= CLOUD_SERVERS:
                         service = GetServiceCloud()
                         s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
-                       # print(f"completion edge - cloud trovato: {s}")
+                        # print(f"completion edge - cloud trovato: {s}")
                         sum[s].service += service
                         sum[s].served += 1
                         events[s].t = stats.t.current + service
@@ -121,23 +118,23 @@ def better_scalability_simulation():
             stats.number_edge -= 1
             s = e
             if stats.number_edge >= EDGE_SERVERS:
-                if stats.queue_edge_E:
+                if stats.queue_edge[0] == "E":
                     service = GetServiceEdgeE()
                     events[s].type = "E"
-                    stats.queue_edge_E -= 1
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
-                    stats.queue_edge_C -= 1
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
+                stats.queue_edge.pop(0)
             else:
                 events[s].x = 0
 
-        elif EDGE_SERVERS + 1 <= e <= CLOUD_SERVERS + EDGE_SERVERS: # completion at cloud server
+        elif EDGE_SERVERS + 1 <= e <= CLOUD_SERVERS + EDGE_SERVERS:  # completion at cloud server
             stats.index_cloud += 1
             stats.number_cloud -= 1
+
             s = e
             if stats.number_cloud >= CLOUD_SERVERS:
                 service = GetServiceCloud()
@@ -150,18 +147,17 @@ def better_scalability_simulation():
 
             stats.number_edge += 1
             stats.number_C += 1
-            stats.queue_edge_C += 1
+            stats.queue_edge.append("C")
 
             if stats.number_edge <= EDGE_SERVERS:
                 service = GetServiceEdgeC()
                 s = FindOne(events, EDGE_SERVERS, 1)
-               # print(f"completion cloud - edge trovato: {s}")
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
                 events[s].x = 1
                 events[s].type = "C"
-                stats.queue_edge_C -= 1
+                stats.queue_edge.pop(0)
         # EndElse
     # EndWhile
 
@@ -197,5 +193,4 @@ def better_scalability_simulation():
         'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
         'C_utilization': stats.area_C.service / stats.t.current if stats.t.current > 0 else 0
     }
-
 

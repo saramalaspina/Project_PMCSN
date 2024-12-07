@@ -1,5 +1,6 @@
 from simulation.priority_scalability_simulator import better_scalability_simulation
 from simulation.priority_simulator import *
+from simulation.scalability_simulator import scalability_simulation
 from simulation.simulator import *
 
 
@@ -22,10 +23,12 @@ def start_finite_simulation():
     elif MODEL == BETTER:
         file_name = "better_finite_statistics.csv"
         print("FINITE BETTER SIMULATION")
+    elif MODEL == SCALABILITY:
+        file_name = "scalability_statistics.csv"
+        print("FINITE SCALABILITY SIMULATION")
     else:
         file_name = "better_scalability_statistics.csv"
         print("FINITE BETTER SCALABILITY SIMULATION")
-
 
     clear_file(file_name)
 
@@ -34,6 +37,8 @@ def start_finite_simulation():
             results = finite_simulation()
         elif MODEL == BETTER:
             results = better_finite_simulation()
+        elif MODEL == SCALABILITY:
+            results = scalability_simulation()
         else:
             results = better_scalability_simulation()
 
@@ -54,10 +59,10 @@ def start_infinite_simulation():
 
     if MODEL == STANDARD:
         batch_stats = infinite_simulation(B, K)
-        print("FINITE STANDARD SIMULATION")
+        print("INFINITE STANDARD SIMULATION")
     else:
         batch_stats = better_infinite_simulation(B, K)
-        print("FINITE BETTER SIMULATION")
+        print("INFINITE BETTER SIMULATION")
 
     type = "batch"
     print_simulation_stats(batch_stats, type)
