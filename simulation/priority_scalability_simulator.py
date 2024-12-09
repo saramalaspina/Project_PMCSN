@@ -153,15 +153,19 @@ def better_scalability_simulation():
             stats.queue_edge_C += 1
 
             if stats.number_edge <= EDGE_SERVERS:
-                service = GetServiceEdgeC()
                 s = FindOne(events, EDGE_SERVERS, 1)
-               # print(f"completion cloud - edge trovato: {s}")
+                if stats.queue_edge_E:
+                    service = GetServiceEdgeE()
+                    events[s].type = "E"
+                    stats.queue_edge_E -= 1
+                else:
+                    service = GetServiceEdgeC()
+                    events[s].type = "C"
+                    stats.queue_edge_C -= 1
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
                 events[s].x = 1
-                events[s].type = "C"
-                stats.queue_edge_C -= 1
         # EndElse
     # EndWhile
 

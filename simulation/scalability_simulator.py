@@ -81,13 +81,19 @@ def scalability_simulation():
                 stats.t.last = stats.t.current
             # EndIf
             if (stats.number_edge <= EDGE_SERVERS):
-                service = GetServiceEdgeE()
                 s = FindOne(events, EDGE_SERVERS, 1)
+
+                if stats.queue_edge[0] == "E":
+                    service = GetServiceEdgeE()
+                    events[s].type = "E"
+                else:
+                    service = GetServiceEdgeC()
+                    events[s].type = "C"
+
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
                 events[s].x = 1
-                events[s].type = "E"
                 stats.queue_edge.pop(0)
             # EndIf
         # EndIf
@@ -150,13 +156,19 @@ def scalability_simulation():
             stats.queue_edge.append("C")
 
             if stats.number_edge <= EDGE_SERVERS:
-                service = GetServiceEdgeC()
                 s = FindOne(events, EDGE_SERVERS, 1)
+
+                if stats.queue_edge[0] == "E":
+                    service = GetServiceEdgeE()
+                    events[s].type = "E"
+                else:
+                    service = GetServiceEdgeC()
+                    events[s].type = "C"
+
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
                 events[s].x = 1
-                events[s].type = "C"
                 stats.queue_edge.pop(0)
         # EndElse
     # EndWhile
