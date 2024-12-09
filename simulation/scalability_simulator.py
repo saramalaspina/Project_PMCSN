@@ -19,9 +19,17 @@ class time:
 class accumSum:
     # accumulated sums of                */
     service = None  # service times                    */
+    serviceE = None
+    serviceC = None
     served = None  # number served                    */
 
 def scalability_simulation():
+
+    area_edge = 0
+    area_cloud = 0
+    area_E = 0
+    area_C = 0
+
     seed = getSeed()
     reset_arrival_temp()
 
@@ -40,6 +48,8 @@ def scalability_simulation():
         events[s].x = 0  # all servers are initially idle  */
         sum[s].service = 0.0
         sum[s].served = 0
+        sum[s].serviceE = 0.0
+        sum[s].serviceC = 0.0
 
     while ((events[0].x != 0) or (stats.number_edge + stats.number_cloud > 0)):
         e = NextEvent(events)  # next event index */
@@ -86,9 +96,11 @@ def scalability_simulation():
                 if stats.queue_edge[0] == "E":
                     service = GetServiceEdgeE()
                     events[s].type = "E"
+                    sum[s].serviceE += service
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
+                    sum[s].serviceC += service
 
                 sum[s].service += service
                 sum[s].served += 1
@@ -127,9 +139,11 @@ def scalability_simulation():
                 if stats.queue_edge[0] == "E":
                     service = GetServiceEdgeE()
                     events[s].type = "E"
+                    sum[s].serviceE += service
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
+                    sum[s].serviceC += service
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
@@ -161,9 +175,11 @@ def scalability_simulation():
                 if stats.queue_edge[0] == "E":
                     service = GetServiceEdgeE()
                     events[s].type = "E"
+                    sum[s].serviceE += service
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
+                    sum[s].serviceC += service
 
                 sum[s].service += service
                 sum[s].served += 1
@@ -172,6 +188,28 @@ def scalability_simulation():
                 stats.queue_edge.pop(0)
         # EndElse
     # EndWhile
+
+    area_edge += stats.area_edge.node
+    area_cloud += stats.area_cloud.node
+    area_E += stats.area_E.node
+    area_C += stats.area_C.node
+
+    for s in range(1, EDGE_SERVERS+1):
+        area_edge -= sum[s].service
+        area_E -= sum[s].serviceE
+        area_C -= sum[s].serviceC
+
+    for s in range(EDGE_SERVERS+1, CLOUD_SERVERS+EDGE_SERVERS+1):
+        area_cloud -= sum[s].service
+
+    print("  avg delay .......... = {0:6.2f}".format(area_edge / stats.index_edge))
+    print("  avg # in queue ..... = {0:6.2f}".format(area_edge / stats.t.current))
+    print("\nthe server statistics are:\n")
+    print("    server     utilization     avg service        share\n")
+    for s in range(1, EDGE_SERVERS + 1):
+        print(
+            "{0:8d} {1:14.3f} {2:15.2f} {3:15.3f}".format(s, sum[s].service / stats.t.current, sum[s].service / sum[s].served,
+                                                          float(sum[s].served) / stats.index_edge))
 
     return {
         'seed': seed,
