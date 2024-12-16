@@ -30,24 +30,35 @@ def start_finite_simulation():
         file_name = "better_scalability_statistics.csv"
         print("FINITE BETTER SCALABILITY SIMULATION")
 
-    clear_file(file_name)
+    if MODEL == SCALABILITY:
+        clear_scalability_file(file_name)
+    else:
+        clear_file(file_name)
 
     for i in range(REPLICATIONS):
         if MODEL == STANDARD:
             results = finite_simulation()
+            write_file(results, file_name)
+            append_stats(replicationStats, results)
         elif MODEL == BETTER:
             results = better_finite_simulation()
+            write_file(results, file_name)
+            append_stats(replicationStats, results)
         elif MODEL == SCALABILITY:
             results = scalability_simulation()
+            write_file1(results, file_name)
+            append_scalability_stats(replicationStats, results)
         else:
             results = better_scalability_simulation()
+            write_file1(results, file_name)
+            append_scalability_stats(replicationStats, results)
 
-        write_file(results, file_name)
+    type = "scalability"
 
-        append_stats(replicationStats, results)
-
-    type = "replications"
-    print_simulation_stats(replicationStats, type)
+    if type == "replications" or type == "batch":
+        print_simulation_stats(replicationStats, type)
+    elif type == "scalability":
+        print_scalability_simulation_stats(replicationStats)
 
 def start_infinite_simulation():
     if MODEL == STANDARD:

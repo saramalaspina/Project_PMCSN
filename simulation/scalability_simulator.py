@@ -194,31 +194,60 @@ def scalability_simulation():
     area_E += stats.area_E.node
     area_C += stats.area_C.node
 
+    # area for each server of edge server
     for s in range(1, EDGE_SERVERS+1):
         area_edge -= sum[s].service
         area_E -= sum[s].serviceE
         area_C -= sum[s].serviceC
 
+    # area for each server of cloud server
     for s in range(EDGE_SERVERS+1, CLOUD_SERVERS+EDGE_SERVERS+1):
         area_cloud -= sum[s].service
 
-    print("  avg delay .......... = {0:6.2f}".format(area_edge / stats.index_edge))
-    print("  avg # in queue ..... = {0:6.2f}".format(area_edge / stats.t.current))
-    print("\nthe server statistics are:\n")
-    print("    server     utilization     avg service        share\n")
+    # variables for multi server statistics
+    edge_num_server = []
+    edge_server_service = []
+    edge_server_utilization = []
+    edge_server_share = []
+
+    edge_server_serviceE = []
+    edge_server_utilizationE = []
+    edge_server_shareE = []
+
+    edge_server_serviceC = []
+    edge_server_utilizationC = []
+    edge_server_shareC = []
+
+    # for cloud server we assume that it remain a single server
+
+    # stats of each server at edge node for job of type E and C
     for s in range(1, EDGE_SERVERS + 1):
-        print(
-            "{0:8d} {1:14.3f} {2:15.2f} {3:15.3f}".format(s, sum[s].service / stats.t.current, sum[s].service / sum[s].served,
-                                                          float(sum[s].served) / stats.index_edge))
+        edge_num_server.append(s)
+        edge_server_utilization.append(sum[s].service / stats.t.current) if stats.t.current > 0 else 0
+        edge_server_service.append(sum[s].service / sum[s].served) if sum[s].served > 0 else 0
+        edge_server_share.append(sum[s].served / stats.index_edge) if stats.index_edge > 0 else 0
+
+    # stats of each server at edge node for job of type E
+    for s in range(1, EDGE_SERVERS + 1):
+        edge_server_utilizationE.append(sum[s].serviceE / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type E
+        edge_server_serviceE.append(sum[s].serviceE / sum[s].served) if sum[s].served > 0 else 0 # service time of this server for job of type E
+        edge_server_shareE.append(sum[s].served / stats.index_E) if stats.index_E > 0 else 0 # avg number of job in this server for job of type E
+
+    # stats of each server at edge node for job of type C
+    for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
+        edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
+        edge_server_serviceC.append(sum[s].serviceC / sum[s].served) if sum[s].served > 0 else 0 # service time of this server for job of type C
+        edge_server_shareC.append(sum[s].served / stats.index_C) if stats.index_C > 0 else 0 # avg number of job in this server for job of type C
 
     return {
         'seed': seed,
         'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_service_time': stats.area_edge.service / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_utilization': stats.area_edge.service / stats.t.current if stats.t.current > 0 else 0,
-        'edge_avg_number_node': stats.area_edge.node / stats.t.current if stats.t.current > 0 else 0,
-        'edge_avg_number_queue': stats.area_edge.queue / stats.t.current if stats.t.current > 0 else 0,
+        'edge_avg_delay': area_edge / stats.index_edge if stats.index_edge > 0 else 0,
+        'edge_avg_number_queue': area_edge / stats.t.current if stats.t.current > 0 else 0,
+        'server_number': edge_num_server,
+        'edge_server_utilization': edge_server_utilization,
+        'edge_server_service': edge_server_service,
+        'edge_number_in_server': edge_server_share,
 
         'cloud_avg_wait': stats.area_cloud.node / stats.index_cloud if stats.index_cloud > 0 else 0,
         'cloud_avg_delay': stats.area_cloud.queue / stats.index_cloud if stats.index_cloud > 0 else 0,
@@ -229,18 +258,18 @@ def scalability_simulation():
 
         'count_E': stats.count_E,
         'E_avg_wait': stats.area_E.node / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_service_time': stats.area_E.service / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
-        'E_avg_number_queue_edge': stats.area_E.queue / stats.t.current if stats.t.current > 0 else 0,
-        'E_utilization': stats.area_E.service / stats.t.current if stats.t.current > 0 else 0,
+        'E_avg_delay': area_E / stats.index_E if stats.index_E > 0 else 0,
+        'E_avg_number_queue_edge': area_E / stats.t.current if stats.t.current > 0 else 0,
+        'E_edge_server_utilization': edge_server_utilizationE,
+        'E_edge_server_service': edge_server_serviceE,
+        'E_edge_number_in_server': edge_server_shareE,
 
         'count_C': stats.count_C,
         'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_service_time': stats.area_C.service / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
-        'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
-        'C_utilization': stats.area_C.service / stats.t.current if stats.t.current > 0 else 0
+        'C_avg_delay': area_C / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_number_queue_edge': area_C / stats.t.current if stats.t.current > 0 else 0,
+        'C_edge_server_utilization': edge_server_utilizationC,
+        'C_edge_server_service': edge_server_serviceC,
+        'C_edge_number_in_server': edge_server_shareC,
     }
 

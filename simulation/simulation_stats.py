@@ -67,6 +67,8 @@ class SimulationStats:
 
 class ReplicationStats:
     def __init__(self):
+        self.edge_num_server = []
+
         self.edge_wait_times = []
         self.edge_delays = []
         self.edge_service_times = []
