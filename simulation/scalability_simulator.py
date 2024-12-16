@@ -125,7 +125,6 @@ def scalability_simulation():
                     if stats.number_cloud <= CLOUD_SERVERS:
                         service = GetServiceCloud()
                         s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
-                        # print(f"completion edge - cloud trovato: {s}")
                         sum[s].service += service
                         sum[s].serviceC += service
                         sum[s].served += 1
@@ -237,7 +236,7 @@ def scalability_simulation():
         edge_server_utilization.append(sum[s].service / stats.t.current) if stats.t.current > 0 else 0
         edge_server_service.append(sum[s].service / sum[s].served) if sum[s].served > 0 else 0
 
-    # stats of each server at edge node for job of type E
+    # stats of each server at edge node for job of type E and type C
     for s in range(1, EDGE_SERVERS + 1):
         edge_server_utilizationE.append(sum[s].serviceE / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type E
         edge_server_serviceE.append(sum[s].serviceE / sum[s].servedE) if sum[s].servedE > 0 else 0 # service time of this server for job of type E
@@ -245,10 +244,10 @@ def scalability_simulation():
         edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0  # utilization of this server for job of type C
         edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0  # service time of this server for job of type C
 
-    # stats of each server at edge node for job of type C
-    for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
-        edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
-        edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0 # service time of this server for job of type C
+    # stats of each server at cloud server (type C job)
+    # for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
+        # edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
+        # edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0 # service time of this server for job of type C
 
     return {
         'seed': seed,
