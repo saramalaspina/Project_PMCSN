@@ -40,22 +40,24 @@ def start_finite_simulation():
             results = finite_simulation()
             write_file(results, file_name)
             append_stats(replicationStats, results)
+            type = "replications"
         elif MODEL == BETTER:
             results = better_finite_simulation()
             write_file(results, file_name)
             append_stats(replicationStats, results)
+            type = "replications"
         elif MODEL == SCALABILITY:
             results = scalability_simulation()
             write_file1(results, file_name)
             append_scalability_stats(replicationStats, results)
+            type = "scalability"
         else:
             results = better_scalability_simulation()
             write_file1(results, file_name)
             append_scalability_stats(replicationStats, results)
+            type = "scalability"
 
-    type = "scalability"
-
-    if type == "replications" or type == "batch":
+    if type == "replications":
         print_simulation_stats(replicationStats, type)
     elif type == "scalability":
         print_scalability_simulation_stats(replicationStats)

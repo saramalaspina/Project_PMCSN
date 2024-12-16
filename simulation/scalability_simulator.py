@@ -21,7 +21,9 @@ class accumSum:
     service = None  # service times                    */
     serviceE = None
     serviceC = None
-    served = None  # number served                    */
+    served = None # number served                    */
+    servedE = None  # number type E served                    */
+    servedC = None # number type C served                    */
 
 def scalability_simulation():
 
@@ -48,6 +50,8 @@ def scalability_simulation():
         events[s].x = 0  # all servers are initially idle  */
         sum[s].service = 0.0
         sum[s].served = 0
+        sum[s].servedE = 0
+        sum[s].servedC = 0
         sum[s].serviceE = 0.0
         sum[s].serviceC = 0.0
 
@@ -97,10 +101,12 @@ def scalability_simulation():
                     service = GetServiceEdgeE()
                     events[s].type = "E"
                     sum[s].serviceE += service
+                    sum[s].servedE += 1
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
                     sum[s].serviceC += service
+                    sum[s].servedC += 1
 
                 sum[s].service += service
                 sum[s].served += 1
@@ -121,7 +127,9 @@ def scalability_simulation():
                         s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
                         # print(f"completion edge - cloud trovato: {s}")
                         sum[s].service += service
+                        sum[s].serviceC += service
                         sum[s].served += 1
+                        sum[s].servedC += 1
                         events[s].t = stats.t.current + service
                         events[s].x = 1
                         events[s].type = "C"
@@ -140,10 +148,12 @@ def scalability_simulation():
                     service = GetServiceEdgeE()
                     events[s].type = "E"
                     sum[s].serviceE += service
+                    sum[s].servedE += 1
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
                     sum[s].serviceC += service
+                    sum[s].servedC += 1
                 sum[s].service += service
                 sum[s].served += 1
                 events[s].t = stats.t.current + service
@@ -159,7 +169,9 @@ def scalability_simulation():
             if stats.number_cloud >= CLOUD_SERVERS:
                 service = GetServiceCloud()
                 sum[s].service += service
+                sum[s].serviceC += service
                 sum[s].served += 1
+                sum[s].servedC += 1
                 events[s].t = stats.t.current + service
                 events[s].type = "C"
             else:
@@ -176,10 +188,12 @@ def scalability_simulation():
                     service = GetServiceEdgeE()
                     events[s].type = "E"
                     sum[s].serviceE += service
+                    sum[s].servedE += 1
                 else:
                     service = GetServiceEdgeC()
                     events[s].type = "C"
                     sum[s].serviceC += service
+                    sum[s].servedC += 1
 
                 sum[s].service += service
                 sum[s].served += 1
@@ -208,15 +222,12 @@ def scalability_simulation():
     edge_num_server = []
     edge_server_service = []
     edge_server_utilization = []
-    edge_server_share = []
 
     edge_server_serviceE = []
     edge_server_utilizationE = []
-    edge_server_shareE = []
 
     edge_server_serviceC = []
     edge_server_utilizationC = []
-    edge_server_shareC = []
 
     # for cloud server we assume that it remain a single server
 
@@ -225,23 +236,19 @@ def scalability_simulation():
         edge_num_server.append(s)
         edge_server_utilization.append(sum[s].service / stats.t.current) if stats.t.current > 0 else 0
         edge_server_service.append(sum[s].service / sum[s].served) if sum[s].served > 0 else 0
-        edge_server_share.append(sum[s].served / stats.index_edge) if stats.index_edge > 0 else 0
 
     # stats of each server at edge node for job of type E
     for s in range(1, EDGE_SERVERS + 1):
         edge_server_utilizationE.append(sum[s].serviceE / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type E
-        edge_server_serviceE.append(sum[s].serviceE / sum[s].served) if sum[s].served > 0 else 0 # service time of this server for job of type E
-        edge_server_shareE.append(sum[s].served / stats.index_E) if stats.index_E > 0 else 0 # avg number of job in this server for job of type E
+        edge_server_serviceE.append(sum[s].serviceE / sum[s].servedE) if sum[s].servedE > 0 else 0 # service time of this server for job of type E
 
         edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0  # utilization of this server for job of type C
-        edge_server_serviceC.append(sum[s].serviceC / sum[s].served) if sum[s].served > 0 else 0  # service time of this server for job of type C
-        edge_server_shareC.append(sum[s].served / stats.index_C) if stats.index_C > 0 else 0  # avg number of job in this server for job of type C
+        edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0  # service time of this server for job of type C
 
     # stats of each server at edge node for job of type C
     for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
         edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
-        edge_server_serviceC.append(sum[s].serviceC / sum[s].served) if sum[s].served > 0 else 0 # service time of this server for job of type C
-        edge_server_shareC.append(sum[s].served / stats.index_C) if stats.index_C > 0 else 0 # avg number of job in this server for job of type C
+        edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0 # service time of this server for job of type C
 
     return {
         'seed': seed,
