@@ -233,6 +233,10 @@ def scalability_simulation():
         edge_server_serviceE.append(sum[s].serviceE / sum[s].served) if sum[s].served > 0 else 0 # service time of this server for job of type E
         edge_server_shareE.append(sum[s].served / stats.index_E) if stats.index_E > 0 else 0 # avg number of job in this server for job of type E
 
+        edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0  # utilization of this server for job of type C
+        edge_server_serviceC.append(sum[s].serviceC / sum[s].served) if sum[s].served > 0 else 0  # service time of this server for job of type C
+        edge_server_shareC.append(sum[s].served / stats.index_C) if stats.index_C > 0 else 0  # avg number of job in this server for job of type C
+
     # stats of each server at edge node for job of type C
     for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
         edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
@@ -247,7 +251,7 @@ def scalability_simulation():
         'server_number': edge_num_server,
         'edge_server_utilization': edge_server_utilization,
         'edge_server_service': edge_server_service,
-        'edge_number_in_server': edge_server_share,
+        'edge_avg_number_node': stats.area_edge.node / stats.t.current if stats.t.current > 0 else 0,
 
         'cloud_avg_wait': stats.area_cloud.node / stats.index_cloud if stats.index_cloud > 0 else 0,
         'cloud_avg_delay': stats.area_cloud.queue / stats.index_cloud if stats.index_cloud > 0 else 0,
@@ -262,7 +266,7 @@ def scalability_simulation():
         'E_avg_number_queue_edge': area_E / stats.t.current if stats.t.current > 0 else 0,
         'E_edge_server_utilization': edge_server_utilizationE,
         'E_edge_server_service': edge_server_serviceE,
-        'E_edge_number_in_server': edge_server_shareE,
+        'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
 
         'count_C': stats.count_C,
         'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
@@ -270,6 +274,6 @@ def scalability_simulation():
         'C_avg_number_queue_edge': area_C / stats.t.current if stats.t.current > 0 else 0,
         'C_edge_server_utilization': edge_server_utilizationC,
         'C_edge_server_service': edge_server_serviceC,
-        'C_edge_number_in_server': edge_server_shareC,
+        'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
 
