@@ -55,26 +55,18 @@ def execute(stats, stop):
 
     if (stats.number_edge > 0): # update integrals  */
         stats.area_edge.node += (stats.t.next - stats.t.current) * stats.number_edge
-        #stats.area_edge.queue += (stats.t.next - stats.t.current) * (stats.number_edge - 1)
-        #stats.area_edge.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_cloud > 0):  # update integrals  */
         stats.area_cloud.node += (stats.t.next - stats.t.current) * stats.number_cloud
-        #stats.area_cloud.queue += (stats.t.next - stats.t.current) * (stats.number_cloud - 1)
-        #stats.area_cloud.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_E > 0):  # update integrals  */
         stats.area_E.node += (stats.t.next - stats.t.current) * stats.number_E
-        #stats.area_E.queue += (stats.t.next - stats.t.current) * (stats.number_E - 1)
-        #stats.area_E.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_C > 0):  # update integrals  */
         stats.area_C.node += (stats.t.next - stats.t.current) * stats.number_C
-        #stats.area_C.queue += (stats.t.next - stats.t.current) * (stats.number_C - 1)
-        #stats.area_C.service += (stats.t.next - stats.t.current)
     # EndIf
 
     stats.t.current = stats.t.next  # advance the clock */

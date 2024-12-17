@@ -26,12 +26,6 @@ class accumSum:
     servedC = None # number type C served                    */
 
 def scalability_simulation():
-
-    area_edge = 0
-    area_cloud = 0
-    area_E = 0
-    area_C = 0
-
     seed = getSeed()
     reset_arrival_temp()
 
@@ -61,25 +55,21 @@ def scalability_simulation():
 
         if (stats.number_edge > 0):  # update integrals  */
             stats.area_edge.node += (stats.t.next - stats.t.current) * stats.number_edge
-            stats.area_edge.queue += (stats.t.next - stats.t.current) * (stats.number_edge - 1)
             stats.area_edge.service += (stats.t.next - stats.t.current)
         # EndIf
 
         if (stats.number_cloud > 0):  # update integrals  */
             stats.area_cloud.node += (stats.t.next - stats.t.current) * stats.number_cloud
-            stats.area_cloud.queue += (stats.t.next - stats.t.current) * (stats.number_cloud - 1)
             stats.area_cloud.service += (stats.t.next - stats.t.current)
         # EndIf
 
         if (stats.number_E > 0):  # update integrals  */
             stats.area_E.node += (stats.t.next - stats.t.current) * stats.number_E
-            stats.area_E.queue += (stats.t.next - stats.t.current) * (stats.number_E - 1)
             stats.area_E.service += (stats.t.next - stats.t.current)
         # EndIf
 
         if (stats.number_C > 0):  # update integrals  */
             stats.area_C.node += (stats.t.next - stats.t.current) * stats.number_C
-            stats.area_C.queue += (stats.t.next - stats.t.current) * (stats.number_C - 1)
             stats.area_C.service += (stats.t.next - stats.t.current)
         # EndIf
 
@@ -126,9 +116,7 @@ def scalability_simulation():
                         service = GetServiceCloud()
                         s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
                         sum[s].service += service
-                        sum[s].serviceC += service
                         sum[s].served += 1
-                        sum[s].servedC += 1
                         events[s].t = stats.t.current + service
                         events[s].x = 1
                         events[s].type = "C"
@@ -168,9 +156,7 @@ def scalability_simulation():
             if stats.number_cloud >= CLOUD_SERVERS:
                 service = GetServiceCloud()
                 sum[s].service += service
-                sum[s].serviceC += service
                 sum[s].served += 1
-                sum[s].servedC += 1
                 events[s].t = stats.t.current + service
                 events[s].type = "C"
             else:
@@ -202,20 +188,20 @@ def scalability_simulation():
         # EndElse
     # EndWhile
 
-    area_edge = stats.area_edge.node
-    area_cloud = stats.area_cloud.node
-    area_E = stats.area_E.node
-    area_C = stats.area_C.node
+    stats.area_edge.queue = stats.area_edge.node
+    stats.area_cloud.queue = stats.area_cloud.node
+    stats.area_E.queue = stats.area_E.node
+    stats.area_C.queue = stats.area_C.node
 
     # area for each server of edge server
     for s in range(1, EDGE_SERVERS+1):
-        area_edge -= sum[s].service
-        area_E -= sum[s].serviceE
-        area_C -= sum[s].serviceC
+        stats.area_edge.queue -= sum[s].service
+        stats.area_E.queue -= sum[s].serviceE
+        stats.area_C.queue -= sum[s].serviceC
 
     # area for each server of cloud server
     for s in range(EDGE_SERVERS+1, CLOUD_SERVERS+EDGE_SERVERS+1):
-        area_cloud -= sum[s].service
+        stats.area_cloud.queue -= sum[s].service
 
     # variables for multi server statistics
     edge_num_server = []
@@ -244,20 +230,15 @@ def scalability_simulation():
         edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0  # utilization of this server for job of type C
         edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0  # service time of this server for job of type C
 
-    # stats of each server at cloud server (type C job)
-    # for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
-        # edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
-        # edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0 # service time of this server for job of type C
-
-    if(stats.index_C == 0):
+    if stats.index_C == 0:
         edge_server_serviceC = [0] * EDGE_SERVERS
         edge_server_utilizationC = [0] * EDGE_SERVERS
 
     return {
         'seed': seed,
         'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_delay': area_edge / stats.index_edge if stats.index_edge > 0 else 0,
-        'edge_avg_number_queue': area_edge / stats.t.current if stats.t.current > 0 else 0,
+        'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
+        'edge_avg_number_queue': stats.area_edge.queue / stats.t.current if stats.t.current > 0 else 0,
         'server_number': edge_num_server,
         'edge_server_utilization': edge_server_utilization,
         'edge_server_service': edge_server_service,
@@ -272,16 +253,16 @@ def scalability_simulation():
 
         'count_E': stats.count_E,
         'E_avg_wait': stats.area_E.node / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_delay': area_E / stats.index_E if stats.index_E > 0 else 0,
-        'E_avg_number_queue_edge': area_E / stats.t.current if stats.t.current > 0 else 0,
+        'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
+        'E_avg_number_queue_edge': stats.area_E.queue / stats.t.current if stats.t.current > 0 else 0,
         'E_edge_server_utilization': edge_server_utilizationE,
         'E_edge_server_service': edge_server_serviceE,
         'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
 
         'count_C': stats.count_C,
         'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_delay': area_C / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_number_queue_edge': area_C / stats.t.current if stats.t.current > 0 else 0,
+        'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
         'C_edge_server_utilization': edge_server_utilizationC,
         'C_edge_server_service': edge_server_serviceC,
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
