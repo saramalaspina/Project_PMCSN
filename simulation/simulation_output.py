@@ -89,7 +89,6 @@ def print_scalability_simulation_stats(stats):
     flat_edge_server_serviceC = list(itertools.chain.from_iterable(stats.C_edge_service_times))
     flat_edge_server_utilizationC = list(itertools.chain.from_iterable(stats.C_edge_utilization))
 
-
     print(f"Edge Node - Average wait time: {statistics.mean(stats.edge_wait_times):.2f} ± {calculate_confidence_interval(stats.edge_wait_times):.2f}")
     print(f"Edge Node - Average delay time: {statistics.mean(stats.edge_delays):.2f} ± {calculate_confidence_interval(stats.edge_delays):.2f}")
     print(f"Edge Node - Average service time: {statistics.mean(flat_edge_server_service):.2f} ± {calculate_confidence_interval(flat_edge_server_service):.2f}")

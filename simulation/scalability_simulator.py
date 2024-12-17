@@ -202,10 +202,10 @@ def scalability_simulation():
         # EndElse
     # EndWhile
 
-    area_edge += stats.area_edge.node
-    area_cloud += stats.area_cloud.node
-    area_E += stats.area_E.node
-    area_C += stats.area_C.node
+    area_edge = stats.area_edge.node
+    area_cloud = stats.area_cloud.node
+    area_E = stats.area_E.node
+    area_C = stats.area_C.node
 
     # area for each server of edge server
     for s in range(1, EDGE_SERVERS+1):
@@ -248,6 +248,10 @@ def scalability_simulation():
     # for s in range(EDGE_SERVERS + 1, CLOUD_SERVERS + EDGE_SERVERS + 1):
         # edge_server_utilizationC.append(sum[s].serviceC / stats.t.current) if stats.t.current > 0 else 0 # utilization of this server for job of type C
         # edge_server_serviceC.append(sum[s].serviceC / sum[s].servedC) if sum[s].servedC > 0 else 0 # service time of this server for job of type C
+
+    if(stats.index_C == 0):
+        edge_server_serviceC = [0] * EDGE_SERVERS
+        edge_server_utilizationC = [0] * EDGE_SERVERS
 
     return {
         'seed': seed,

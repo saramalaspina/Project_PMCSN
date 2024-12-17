@@ -18,8 +18,8 @@ from rngs import plantSeeds, random, selectStream
 from math import log
 
 START =   0.0                    # initial (open the door)        */
-STOP  =   20000.0                # terminal (close the door) time */
-SERVERS = 4                      # number of servers              */
+STOP  =   86400.0                # terminal (close the door) time */
+SERVERS = 3                      # number of servers              */
 arrivalTemp = START
 
 # typedef struct {                        # the next-event list    */
@@ -51,7 +51,7 @@ def GetArrival():
   global arrivalTemp
 
   selectStream(0) 
-  arrivalTemp += Exponential(2.0)
+  arrivalTemp += Exponential(1/1.4)
   return (arrivalTemp)
 
 
@@ -62,7 +62,7 @@ def GetService():
 # * --------------------------------------------
 # */ 
   selectStream(1)
-  return (Uniform(2.0, 10.0))
+  return (Exponential(0.5))
 
 
 def NextEvent(events):

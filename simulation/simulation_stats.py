@@ -64,6 +64,11 @@ class SimulationStats:
         self.area_E = Track()  # stats tracking job of type E
         self.area_C = Track()  # stats tracking job of type C in edge node
 
+    def calculate_area_queue(self):
+        self.area_edge.queue = self.area_edge.node - self.area_edge.service
+        self.area_cloud.queue = self.area_cloud.node - self.area_cloud.service
+        self.area_E.queue = self.area_E.node - self.area_E.service
+        self.area_C.queue = self.area_C.node - self.area_C.service
 
 class ReplicationStats:
     def __init__(self):
@@ -101,5 +106,3 @@ class ReplicationStats:
         self.C_edge_utilization = []
         self.C_edge_number_node = []
         self.C_edge_number_queue = []
-
-

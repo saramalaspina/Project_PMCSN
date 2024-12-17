@@ -22,6 +22,9 @@ def finite_simulation():
 
     while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
         execute(stats, STOP)
+
+    stats.calculate_area_queue()
+
     # Collect and return the results
     return return_stats(stats, stats.t.current, s)
 
@@ -52,26 +55,26 @@ def execute(stats, stop):
 
     if (stats.number_edge > 0): # update integrals  */
         stats.area_edge.node += (stats.t.next - stats.t.current) * stats.number_edge
-        stats.area_edge.queue += (stats.t.next - stats.t.current) * (stats.number_edge - 1)
-        stats.area_edge.service += (stats.t.next - stats.t.current)
+        #stats.area_edge.queue += (stats.t.next - stats.t.current) * (stats.number_edge - 1)
+        #stats.area_edge.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_cloud > 0):  # update integrals  */
         stats.area_cloud.node += (stats.t.next - stats.t.current) * stats.number_cloud
-        stats.area_cloud.queue += (stats.t.next - stats.t.current) * (stats.number_cloud - 1)
-        stats.area_cloud.service += (stats.t.next - stats.t.current)
+        #stats.area_cloud.queue += (stats.t.next - stats.t.current) * (stats.number_cloud - 1)
+        #stats.area_cloud.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_E > 0):  # update integrals  */
         stats.area_E.node += (stats.t.next - stats.t.current) * stats.number_E
-        stats.area_E.queue += (stats.t.next - stats.t.current) * (stats.number_E - 1)
-        stats.area_E.service += (stats.t.next - stats.t.current)
+        #stats.area_E.queue += (stats.t.next - stats.t.current) * (stats.number_E - 1)
+        #stats.area_E.service += (stats.t.next - stats.t.current)
     # EndIf
 
     if (stats.number_C > 0):  # update integrals  */
         stats.area_C.node += (stats.t.next - stats.t.current) * stats.number_C
-        stats.area_C.queue += (stats.t.next - stats.t.current) * (stats.number_C - 1)
-        stats.area_C.service += (stats.t.next - stats.t.current)
+        #stats.area_C.queue += (stats.t.next - stats.t.current) * (stats.number_C - 1)
+        #stats.area_C.service += (stats.t.next - stats.t.current)
     # EndIf
 
     stats.t.current = stats.t.next  # advance the clock */
@@ -87,7 +90,10 @@ def execute(stats, stop):
             stats.t.arrival = INFINITY
 
         if (stats.number_edge == 1):
-            stats.t.completion_edge = stats.t.current + GetServiceEdgeE()
+            service = GetServiceEdgeE()
+            stats.t.completion_edge = stats.t.current + service
+            stats.area_edge.service += service
+            stats.area_E.service += service
 
     elif stats.t.current == stats.t.completion_edge:  # Process completion at edge node
         if stats.queue_edge[0] == "E":  # The job has not returned yet
@@ -97,7 +103,9 @@ def execute(stats, stop):
             if random() < P_C:  # With probability p, send job to server 2
                 stats.number_cloud += 1
                 if stats.number_cloud == 1:  # If server 2 is idle, start service
-                    stats.t.completion_cloud = stats.t.current + GetServiceCloud()
+                    service = GetServiceCloud()
+                    stats.t.completion_cloud = stats.t.current + service
+                    stats.area_cloud.service += service
             else:
                 stats.count_E += 1
         else:
@@ -110,9 +118,15 @@ def execute(stats, stop):
         stats.queue_edge.pop(0)
         if stats.number_edge > 0:
             if stats.queue_edge[0] == "E":
-                stats.t.completion_edge = stats.t.current + GetServiceEdgeE()
+                service = GetServiceEdgeE()
+                stats.t.completion_edge = stats.t.current + service
+                stats.area_edge.service += service
+                stats.area_E.service += service
             else:
-                stats.t.completion_edge = stats.t.current + GetServiceEdgeC()
+                service = GetServiceEdgeC()
+                stats.t.completion_edge = stats.t.current + service
+                stats.area_edge.service += service
+                stats.area_C.service += service
         else:
             stats.t.completion_edge = INFINITY
 
@@ -120,7 +134,9 @@ def execute(stats, stop):
         stats.index_cloud += 1
         stats.number_cloud -= 1
         if stats.number_cloud > 0:
-            stats.t.completion_cloud = stats.t.current + GetServiceCloud()
+            service = GetServiceCloud()
+            stats.t.completion_cloud = stats.t.current + service
+            stats.area_cloud.service += service
         else:
             stats.t.completion_cloud = INFINITY
 
@@ -128,7 +144,10 @@ def execute(stats, stop):
         stats.number_C += 1
         stats.queue_edge.append("C")
         if stats.number_edge == 1:  # If edge node is idle, start service
-            stats.t.completion_edge = stats.t.current + GetServiceEdgeC()
+            service = GetServiceEdgeC()
+            stats.t.completion_edge = stats.t.current + service
+            stats.area_edge.service += service
+            stats.area_C.service += service
 
 def return_stats(stats, t, s):
     return {
@@ -153,12 +172,12 @@ def return_stats(stats, t, s):
         'E_avg_service_time': stats.area_E.service / stats.index_E if stats.index_E > 0 else 0,
         'E_avg_number_edge': stats.area_E.node / t if t > 0 else 0,
         'E_avg_number_queue_edge': stats.area_E.queue / t if t > 0 else 0,
-        'E_utilization': stats.area_E.service / t if t > 0 else 0,
+        'E_utilization': stats.area_E.service/ t if t > 0 else 0,
 
         'count_C': stats.count_C,
         'C_avg_wait': stats.area_C.node / stats.index_C if stats.index_C > 0 else 0,
         'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
-        'C_avg_service_time': stats.area_C.service / stats.index_C if stats.index_C > 0 else 0,
+        'C_avg_service_time': stats.area_C.service/ stats.index_C if stats.index_C > 0 else 0,
         'C_avg_number_edge': stats.area_C.node / t if t > 0 else 0,
         'C_avg_number_queue_edge': stats.area_C.queue / t if t > 0 else 0,
         'C_utilization': stats.area_C.service / t if t > 0 else 0
