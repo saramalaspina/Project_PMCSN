@@ -1,4 +1,4 @@
-MEAN_ARRIVAL_TIME = 1.4  # Tempo medio di arrivo dei job [secondo/job]
+LAMBDA = 1.4  # Tempo medio di arrivo dei job [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -7,7 +7,7 @@ P_C = 0
 
 SEED = 123456789
 
-REPLICATIONS = 1
+REPLICATIONS = 10
 
 INFINITE = 0
 FINITE = 1

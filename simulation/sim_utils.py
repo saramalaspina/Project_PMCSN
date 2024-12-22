@@ -36,7 +36,7 @@ def GetArrival():
     """Generate the next arrival time for the first server."""
     global arrivalTemp
     selectStream(0)
-    arrivalTemp += Exponential(1 / MEAN_ARRIVAL_TIME)
+    arrivalTemp += Exponential(1 / LAMBDA)
     return arrivalTemp
 
 def reset_arrival_temp():
