@@ -64,7 +64,11 @@ def calculate_confidence_interval(data):
     if n == 0:
         return 0.0, 0.0  # no data
 
-    standard_deviation = statistics.stdev(data)
+    if n > 1:
+        standard_deviation = statistics.stdev(data)
+    else:
+        standard_deviation = 0
+        return standard_deviation
 
     # get t* for interval confidence
     t_star = rvms.idfStudent(n - 1, 1 - ALPHA / 2)

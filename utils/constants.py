@@ -1,13 +1,13 @@
-MEAN_ARRIVAL_TIME = 2  # Tempo medio di arrivo dei job [secondo/job]
+MEAN_ARRIVAL_TIME = 1.4  # Tempo medio di arrivo dei job [secondo/job]
 
-EDGE_SERVERS = 2
-CLOUD_SERVERS = 2
+EDGE_SERVERS = 1
+CLOUD_SERVERS = 1
 
-P_C = 0.8
+P_C = 0
 
 SEED = 123456789
 
-REPLICATIONS = 10
+REPLICATIONS = 1
 
 INFINITE = 0
 FINITE = 1
@@ -17,7 +17,7 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = BETTER_SCALABILITY
+MODEL = STANDARD
 
 START = 0.0  # initial time
 STOP = 86400.00  # terminal (close the door) time
