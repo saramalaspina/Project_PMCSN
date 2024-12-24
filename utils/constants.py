@@ -1,9 +1,9 @@
-LAMBDA = 1.4  # Tempo medio di arrivo dei job [secondo/job]
+LAMBDA = 1.4  # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
 
-P_C = 0
+P_C = 0.4
 
 SEED = 123456789
 
@@ -17,7 +17,7 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = STANDARD
+MODEL = SCALABILITY
 
 START = 0.0  # initial time
 STOP = 86400.00  # terminal (close the door) time
@@ -26,5 +26,5 @@ INFINITY = float('inf')  # must be much larger than STOP
 
 ALPHA = 0.05 # 95% confidence
 
-K = 260
+K = 96
 B = 1096
