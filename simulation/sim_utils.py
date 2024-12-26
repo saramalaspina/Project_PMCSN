@@ -85,13 +85,13 @@ def calculate_confidence_interval(data):
 
     return margin_of_error
 
-def NextEvent(events, num_server):
+def NextEvent(events):
     i = 0
     while events[i].x == 0:  # find the index of the first 'active' */
         i += 1  # element in the event list            */
     # EndWhile
     e = i
-    while i < num_server:  # now, check the others to find which  */
+    while i < EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX:  # now, check the others to find which  */
         i += 1  # event type is most imminent          */
         if (events[i].x == 1) and (events[i].t < events[e].t):
             e = i

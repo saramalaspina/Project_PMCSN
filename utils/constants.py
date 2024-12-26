@@ -3,6 +3,26 @@ LAMBDA = 1.4  # mean arrival time [secondo/job]
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
 
+EDGE_SERVERS_MAX = 2
+CLOUD_SERVERS_MAX = 2
+
+def increment_edge():
+    global EDGE_SERVERS
+    EDGE_SERVERS += 1
+
+def decrement_edge():
+    global EDGE_SERVERS
+    EDGE_SERVERS -= 1
+
+def increment_cloud():
+    global CLOUD_SERVERS
+    CLOUD_SERVERS += 1
+
+def decrement_cloud():
+    global CLOUD_SERVERS
+    CLOUD_SERVERS -= 1
+
+
 P_C = 0.4
 
 SEED = 123456789
