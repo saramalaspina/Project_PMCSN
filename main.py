@@ -47,6 +47,7 @@ def start_finite_simulation():
             append_stats(replicationStats, results)
             type = "replications"
         elif MODEL == SCALABILITY:
+            print(i)
             results = scalability_simulation()
             write_file1(results, file_name)
             append_scalability_stats(replicationStats, results)

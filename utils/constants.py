@@ -22,8 +22,12 @@ def decrement_cloud():
     global CLOUD_SERVERS
     CLOUD_SERVERS -= 1
 
+def set_servers(edge_num, cloud_num):
+    global EDGE_SERVERS, CLOUD_SERVERS
+    EDGE_SERVERS = edge_num
+    CLOUD_SERVERS = cloud_num
 
-P_C = 0.4
+P_C = 0.9
 
 SEED = 123456789
 

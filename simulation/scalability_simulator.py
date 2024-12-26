@@ -28,6 +28,7 @@ class accumSum:
 
 def scalability_simulation():
     seed = getSeed()
+    set_servers(1,1)
     reset_arrival_temp()
 
     stats = SimulationStats()
@@ -37,6 +38,8 @@ def scalability_simulation():
     # e                      # next event index                   */
     # s                      # server index                       */
     sum = [accumSum() for i in range(0, EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX + 1)]
+
+    cloud_queue = 0
 
     current_lambda = GetLambda(stats.t.current)  # update λ based on current time
 
@@ -115,6 +118,7 @@ def scalability_simulation():
                 selectStream(3)
                 if random() < P_C:  # With probability p, send job to cloud server
                     stats.number_cloud += 1
+                    cloud_queue += 1
                     if stats.number_cloud <= cs.CLOUD_SERVERS:
                         service = GetServiceCloud()
                         s = FindOne(events, cs.CLOUD_SERVERS + EDGE_SERVERS_MAX, EDGE_SERVERS_MAX + 1)
@@ -123,6 +127,7 @@ def scalability_simulation():
                         events[s].t = stats.t.current + service
                         events[s].x = 1
                         events[s].type = "C"
+                        cloud_queue -= 1
                 else:
                     stats.count_E += 1
             else:
@@ -134,7 +139,7 @@ def scalability_simulation():
             stats.number_edge -= 1
             s = e
             if s <= cs.EDGE_SERVERS:
-                if stats.number_edge >= cs.EDGE_SERVERS:
+                if len(stats.queue_edge) != 0:
                     if stats.queue_edge[0] == "E":
                         service = GetServiceEdgeE()
                         events[s].type = "E"
@@ -160,12 +165,13 @@ def scalability_simulation():
 
             s = e
             if s <= EDGE_SERVERS_MAX + cs.CLOUD_SERVERS:
-                if stats.number_cloud >= cs.CLOUD_SERVERS:
+                if cloud_queue > 0:
                     service = GetServiceCloud()
                     sum[s].service += service
                     sum[s].served += 1
                     events[s].t = stats.t.current + service
                     events[s].type = "C"
+                    cloud_queue -= 1
                 else:
                     events[s].x = 0
             else:
