@@ -90,7 +90,7 @@ def scalability_simulation():
                 events[0].x = 0
                 stats.t.last = stats.t.current
             # EndIf
-            if (stats.number_edge <= cs.EDGE_SERVERS):
+            if check_available_server(events, cs.EDGE_SERVERS, 1) == 1:
                 s = FindOne(events, cs.EDGE_SERVERS, 1)
 
                 if stats.queue_edge[0] == "E":
@@ -119,7 +119,7 @@ def scalability_simulation():
                 if random() < P_C:  # With probability p, send job to cloud server
                     stats.number_cloud += 1
                     cloud_queue += 1
-                    if stats.number_cloud <= cs.CLOUD_SERVERS:
+                    if check_available_server(events, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS, EDGE_SERVERS_MAX+1) == 1:
                         service = GetServiceCloud()
                         s = FindOne(events, cs.CLOUD_SERVERS + EDGE_SERVERS_MAX, EDGE_SERVERS_MAX + 1)
                         sum[s].service += service
@@ -181,7 +181,7 @@ def scalability_simulation():
             stats.number_C += 1
             stats.queue_edge.append("C")
 
-            if stats.number_edge <= cs.EDGE_SERVERS:
+            if check_available_server(events, cs.EDGE_SERVERS, 1) == 1:
                 s = FindOne(events, cs.EDGE_SERVERS, 1)
 
                 if stats.queue_edge[0] == "E":
@@ -289,6 +289,13 @@ def scalability_simulation():
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
 
+def check_available_server(events, servers, i):
+    found = 0
+    while i <= servers and found == 0:
+        if events[i].x == 0:
+            found = 1
+        i += 1
+    return found
 
 def GetLambda(current_time):
     # 6:00 -> 10:00 | 16:00 -> 20:00 : high time slot
