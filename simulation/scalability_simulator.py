@@ -58,7 +58,7 @@ def scalability_simulation():
 
     while ((events[0].x != 0) or (stats.number_edge + stats.number_cloud > 0)):
         current_lambda = GetLambda(stats.t.current)
-        AdjustServers(stats, sum)
+        AdjustServers(stats, sum, current_lambda)
         e = NextEvent(events)
 
         stats.t.next = events[e].t # next event time  */
@@ -307,17 +307,18 @@ def GetLambda(current_time):
     else:
         return 1.4
 
-def AdjustServers(stats, sum):
-    edge_utilization = 0
-    cloud_utilization = 0
+def AdjustServers(stats, sum, current_lambda):
+    edge_utilization = current_lambda * 0.54
+    cloud_utilization = (current_lambda * 0.4) * 0.8
 
     # calculation of the sum of server utilization in the edge node
-    for s in range(1, cs.EDGE_SERVERS + 1):
-        edge_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
+    # for s in range(1, cs.EDGE_SERVERS + 1):
+        # edge_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
 
     # calculation of the sum of server utilization in the cloud server
-    for s in range(EDGE_SERVERS_MAX + 1, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS + 1):
-        cloud_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
+    # for s in range(EDGE_SERVERS_MAX + 1, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS + 1):
+        # cloud_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
+
 
     # conditions for adding server
     # Edge node
@@ -341,3 +342,7 @@ def AdjustServers(stats, sum):
         decrement_cloud()
         print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
 
+    if 10000 <= stats.t.current <= 10200 or 30000 <= stats.t.current <= 30200 or 40000 <= stats.t.current <= 40200 or 50000 <= stats.t.current <= 50200 or 65000 <=stats.t.current <= 65200 or 75000 <=stats.t.current <= 75200 or 84000 <=stats.t.current <= 84200:
+        print(f"current time: {stats.t.current}")
+        print(f"edge utilization: {edge_utilization / cs.EDGE_SERVERS} cloud utilization: {cloud_utilization / cs.CLOUD_SERVERS}")
+        print(f"server in the edge: {cs.EDGE_SERVERS} ; server in the cloud {cs.CLOUD_SERVERS}")

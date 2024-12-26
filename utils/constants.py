@@ -27,11 +27,11 @@ def set_servers(edge_num, cloud_num):
     EDGE_SERVERS = edge_num
     CLOUD_SERVERS = cloud_num
 
-P_C = 0.9
+P_C = 0.4
 
 SEED = 123456789
 
-REPLICATIONS = 10
+REPLICATIONS = 1
 
 INFINITE = 0
 FINITE = 1
