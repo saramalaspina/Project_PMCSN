@@ -1,11 +1,11 @@
 import math
 from math import log
-from libraries import rngs, rvms
+from libraries import rvms
 from libraries.rngs import selectStream, random
-from utils.constants import *
 import statistics
+import utils.constants as cs
 
-arrivalTemp = START
+arrivalTemp = cs.START
 
 streams = {
     'edge_node': 1,
@@ -36,7 +36,7 @@ def GetArrival():
     """Generate the next arrival time for the first server."""
     global arrivalTemp
     selectStream(0)
-    arrivalTemp += Exponential(1 / LAMBDA)
+    arrivalTemp += Exponential(1 / cs.LAMBDA)
     return arrivalTemp
 
 def GetArrivalWithLambda(current_lambda):
@@ -48,7 +48,7 @@ def GetArrivalWithLambda(current_lambda):
 
 def reset_arrival_temp():
     global arrivalTemp
-    arrivalTemp = START
+    arrivalTemp = cs.START
 
 
 def GetServiceEdgeE():
@@ -78,7 +78,7 @@ def calculate_confidence_interval(data):
         return standard_deviation
 
     # get t* for interval confidence
-    t_star = rvms.idfStudent(n - 1, 1 - ALPHA / 2)
+    t_star = rvms.idfStudent(n - 1, 1 - cs.ALPHA / 2)
 
     # calculate confidence interval
     margin_of_error = t_star * standard_deviation / math.sqrt(n - 1)
@@ -91,7 +91,7 @@ def NextEvent(events):
         i += 1  # element in the event list            */
     # EndWhile
     e = i
-    while i < EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX:  # now, check the others to find which  */
+    while i < cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS_MAX:  # now, check the others to find which  */
         i += 1  # event type is most imminent          */
         if (events[i].x == 1) and (events[i].t < events[e].t):
             e = i
@@ -174,6 +174,82 @@ def append_scalability_stats(replicationStats, results):
     replicationStats.C_edge_utilization.append(results['edge_weight_utilizationC'])
     replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
     replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
+
+
+def check_available_server(events, servers, i):
+    found = 0
+    while i <= servers and found == 0:
+        if events[i].x == 0:
+            found = 1
+        i += 1
+    return found
+
+
+def GetLambda(current_time):
+    # 6:00 -> 10:00 | 16:00 -> 20:00 : high time slot
+    if 21600 <= current_time < 36000 or 57600 <= current_time < 72000:
+        return 2.7
+    # 10:00 -> 13:00 | 20:00 -> 23:00 : average time slot
+    elif 36000 <= current_time < 46800 or 72000 <= current_time < 82800:
+        return 1.4
+    # 13:00 -> 16:00 : low time slot
+    elif 46800 <= current_time < 57600:
+        return 0.8
+    # 23:00 -> 00:00 | 00:00 -> 6:00 -> : very low time slot
+    elif 82800 <= current_time < 86400 or 0 <= current_time < 21600:
+        return 0.2
+    # default
+    else:
+        return 1.4
+
+
+def AdjustServers(current_lambda, work_time, slot_time):
+    edge_utilization = current_lambda * 0.54
+    cloud_utilization = (current_lambda * 0.4) * 0.8
+
+    # conditions for adding server
+    # Edge node
+    if cs.EDGE_SERVERS < cs.EDGE_SERVERS_MAX and edge_utilization / cs.EDGE_SERVERS > 0.8:  # add 1 server for utilization > 80%
+        cs.increment_edge()
+        print(f"1 server added in the Edge node. Total: {cs.EDGE_SERVERS}")
+        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS)
+
+    # Cloud server
+    if cs.CLOUD_SERVERS < cs.CLOUD_SERVERS_MAX and cloud_utilization / cs.CLOUD_SERVERS > 0.8:  # add 1 server for utilization > 80%
+        cs.increment_cloud()
+        print(f"1 server added in the Cloud server. Total: {cs.CLOUD_SERVERS}")
+        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS)
+
+    # condition for removing server
+    # Edge node
+    if cs.EDGE_SERVERS > 1 and edge_utilization / cs.EDGE_SERVERS < 0.3:  # remove 1 server for utilization < 30%
+        cs.decrement_edge()
+        print(f"1 server removed from Edge node. Total: {cs.EDGE_SERVERS}")
+
+    # Cloud server
+    if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
+        cs.decrement_cloud()
+        print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
+
+    return work_time, slot_time
+
+
+def set_work_time (current_lambda, work_time, slot_time, num_server):
+    # this function calculates the fraction of work of a server based on slot time
+    if current_lambda == 2.7 and slot_time[num_server - 1].highSlotTime == 0:
+        slot_time[num_server - 1].highSlotTime = 1
+        work_time[num_server - 1] += 8/24
+    elif current_lambda == 1.4 and slot_time[num_server - 1].averageSlotTime == 0:
+        slot_time[num_server - 1].averageSlotTime = 1
+        work_time[num_server - 1] += 6/24
+    elif current_lambda == 0.8 and slot_time[num_server - 1].lowSlotTime == 0:
+        slot_time[num_server - 1].lowSlotTime = 1
+        work_time[num_server - 1] += 3/24
+    elif current_lambda == 0.2 and slot_time[num_server - 1].minSlotTime == 0:
+        slot_time[num_server - 1].minSlotTime = 1
+        work_time[num_server - 1] += 7/24
+
+    return work_time, slot_time
 
 
 

@@ -1,37 +1,12 @@
 from libraries.rngs import plantSeeds, getSeed
 from simulation.scalability_simulator import GetLambda
 from simulation.sim_utils import*
-from simulation.simulation_stats import SimulationStats
+from simulation.simulation_stats import*
 from simulation.simulation_output import *
 import utils.constants as cs
 
 plantSeeds(SEED)
 
-class event:
-    t = None  # next event time
-    x = None  # event status, 0 or 1
-    type = None # "E" if job E, "C" if job C in service
-
-
-class time:
-    current = None  # current time                       */
-    next = None  # next (most imminent) event time    */
-
-
-class accumSum:
-    # accumulated sums of                */
-    service = None  # service times                    */
-    serviceE = None
-    serviceC = None
-    served = None  # number served                    */
-    servedE = None  # number type E served                    */
-    servedC = None  # number type C served                    */
-
-class slotTime:
-    highSlotTime = 0
-    averageSlotTime = 0
-    lowSlotTime = 0
-    minSlotTime = 0
 
 def better_scalability_simulation():
     seed = getSeed()
@@ -41,22 +16,22 @@ def better_scalability_simulation():
     stats = SimulationStats()
     stats.reset(START)
 
-    events = [event() for i in range(EDGE_SERVERS + CLOUD_SERVERS + 1)]
+    events = [event() for i in range(EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX + 1)]
     # e                      # next event index                   */
     # s                      # server index                       */
-    sum = [accumSum() for i in range(0, EDGE_SERVERS + CLOUD_SERVERS + 1)]
+    sum = [accumSum() for i in range(0, EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX + 1)]
 
     cloud_queue = 0
     work_time = [0] * (EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)
 
     work_time[0] = 1  # at least one server at edge node is always allocated (100%)
-    work_time[2] = 1  # at least one server at cloud server is always allocated (100%)
+    work_time[EDGE_SERVERS_MAX] = 1  # at least one server at cloud server is always allocated (100%)
 
     slot_time = [slotTime() for i in range(EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)]
 
     current_lambda = GetLambda(stats.t.current)  # update λ based on current time
 
-    events[0].t = GetArrival()
+    events[0].t = GetArrivalWithLambda(current_lambda)
     events[0].x = 1
 
     for s in range(1, EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX + 1):
@@ -70,9 +45,11 @@ def better_scalability_simulation():
         sum[s].serviceC = 0.0
 
     while ((events[0].x != 0) or (stats.number_edge + stats.number_cloud > 0)):
+        print(f"{stats.t.current}")
         current_lambda = GetLambda(stats.t.current)
         work_time, slot_time = AdjustServers(current_lambda, work_time, slot_time)
         e = NextEvent(events)  # next event index */
+
         stats.t.next = events[e].t  # next event time  */
 
         if (stats.number_edge > 0):  # update integrals  */
@@ -97,15 +74,14 @@ def better_scalability_simulation():
             stats.number_edge += 1
             stats.number_E += 1
             stats.queue_edge_E += 1
-
-            events[0].t = GetArrival()
+            events[0].t = GetArrivalWithLambda(current_lambda)
             if (events[0].t > STOP):
                 events[0].x = 0
                 stats.t.last = stats.t.current
             # EndIf
-            if (stats.number_edge <= EDGE_SERVERS):
+            if check_available_server(events, cs.EDGE_SERVERS, 1) == 1:
                 service = GetServiceEdgeE()
-                s = FindOne(events, EDGE_SERVERS, 1)
+                s = FindOne(events, cs.EDGE_SERVERS, 1)
                 sum[s].service += service
                 sum[s].serviceE += service
                 sum[s].served += 1
@@ -116,21 +92,23 @@ def better_scalability_simulation():
                 stats.queue_edge_E -= 1
             # EndIf
         # EndIf
-        elif 1 <= e <= EDGE_SERVERS: # completion at edge node
+        elif 1 <= e <= EDGE_SERVERS_MAX: # completion at edge node
             if events[e].type == "E":
                 stats.number_E -= 1
                 stats.index_E += 1
                 selectStream(3)
                 if random() < P_C:  # With probability p, send job to cloud server
                     stats.number_cloud += 1
-                    if stats.number_cloud <= CLOUD_SERVERS:
+                    cloud_queue += 1
+                    if check_available_server(events, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS, EDGE_SERVERS_MAX+1) == 1:
                         service = GetServiceCloud()
-                        s = FindOne(events, CLOUD_SERVERS + EDGE_SERVERS, EDGE_SERVERS + 1)
+                        s = FindOne(events, cs.CLOUD_SERVERS + EDGE_SERVERS_MAX, EDGE_SERVERS_MAX + 1)
                         sum[s].service += service
                         sum[s].served += 1
                         events[s].t = stats.t.current + service
                         events[s].x = 1
                         events[s].type = "C"
+                        cloud_queue -= 1
                 else:
                     stats.count_E += 1
             else:
@@ -141,36 +119,43 @@ def better_scalability_simulation():
             stats.index_edge += 1
             stats.number_edge -= 1
             s = e
-            if stats.number_edge >= EDGE_SERVERS:
-                if stats.queue_edge_E:
-                    service = GetServiceEdgeE()
-                    events[s].type = "E"
-                    stats.queue_edge_E -= 1
-                    sum[s].servedE += 1
-                    sum[s].serviceE += service
-                else:
-                    service = GetServiceEdgeC()
-                    events[s].type = "C"
-                    stats.queue_edge_C -= 1
-                    sum[s].servedC += 1
-                    sum[s].serviceC += service
+            if s <= cs.EDGE_SERVERS:
+                if len(stats.queue_edge) != 0:
+                    if stats.queue_edge_E:
+                        service = GetServiceEdgeE()
+                        events[s].type = "E"
+                        stats.queue_edge_E -= 1
+                        sum[s].servedE += 1
+                        sum[s].serviceE += service
+                    else:
+                        service = GetServiceEdgeC()
+                        events[s].type = "C"
+                        stats.queue_edge_C -= 1
+                        sum[s].servedC += 1
+                        sum[s].serviceC += service
 
-                sum[s].service += service
-                sum[s].served += 1
-                events[s].t = stats.t.current + service
+                    sum[s].service += service
+                    sum[s].served += 1
+                    events[s].t = stats.t.current + service
+                else:
+                    events[s].x = 0
             else:
                 events[s].x = 0
 
-        elif EDGE_SERVERS + 1 <= e <= CLOUD_SERVERS + EDGE_SERVERS: # completion at cloud server
+        elif EDGE_SERVERS_MAX + 1 <= e <= CLOUD_SERVERS_MAX + EDGE_SERVERS_MAX: # completion at cloud server
             stats.index_cloud += 1
             stats.number_cloud -= 1
             s = e
-            if stats.number_cloud >= CLOUD_SERVERS:
-                service = GetServiceCloud()
-                sum[s].service += service
-                sum[s].served += 1
-                events[s].t = stats.t.current + service
-                events[s].type = "C"
+            if s <= EDGE_SERVERS_MAX + cs.CLOUD_SERVERS:
+                if cloud_queue > 0:
+                    service = GetServiceCloud()
+                    sum[s].service += service
+                    sum[s].served += 1
+                    events[s].t = stats.t.current + service
+                    events[s].type = "C"
+                    cloud_queue -= 1
+                else:
+                    events[s].x = 0
             else:
                 events[s].x = 0
 
@@ -178,8 +163,8 @@ def better_scalability_simulation():
             stats.number_C += 1
             stats.queue_edge_C += 1
 
-            if stats.number_edge <= EDGE_SERVERS:
-                s = FindOne(events, EDGE_SERVERS, 1)
+            if check_available_server(events, cs.EDGE_SERVERS, 1) == 1:
+                s = FindOne(events, cs.EDGE_SERVERS, 1)
                 if stats.queue_edge_E:
                     service = GetServiceEdgeE()
                     events[s].type = "E"
@@ -219,16 +204,20 @@ def better_scalability_simulation():
     edge_num_server = []
     edge_service = []
     edge_utilization = []
+    edge_weight_utilization = []
 
     edge_serviceE = []
     edge_utilizationE = []
+    edge_weight_utilizationE = []
 
     edge_serviceC = []
     edge_utilizationC = []
+    edge_weight_utilizationC = []
 
     cloud_server = []
     cloud_service = []
     cloud_utilization = []
+    cloud_weight_utilization = []
 
     # stats of each server at edge node for job of type E and C
     for s in range(1, EDGE_SERVERS_MAX + 1):
@@ -252,12 +241,12 @@ def better_scalability_simulation():
         cloud_utilization = [0] * CLOUD_SERVERS
 
     for s in range(0, EDGE_SERVERS_MAX):
-        edge_utilization[s] += edge_utilization[s] * work_time[s]
-        edge_utilizationE[s] += edge_utilizationE[s] * work_time[s]
-        edge_utilizationC[s] += edge_utilizationC[s] * work_time[s]
+        edge_weight_utilization.append(edge_utilization[s] * work_time[s])
+        edge_weight_utilizationE.append(edge_utilizationE[s] * work_time[s])
+        edge_weight_utilizationC.append(edge_utilizationC[s] * work_time[s])
 
     for s in range(0, CLOUD_SERVERS_MAX):
-        cloud_utilization[s] += cloud_utilization[s] * work_time[s]
+        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s])
 
     return {
         'seed': seed,
@@ -266,6 +255,7 @@ def better_scalability_simulation():
         'edge_avg_number_queue': stats.area_edge.queue / stats.t.current if stats.t.current > 0 else 0,
         'edge_server_number': edge_num_server,
         'edge_server_utilization': edge_utilization,
+        'edge_weight_utilization': edge_weight_utilization,
         'edge_server_service': edge_service,
         'edge_avg_number_node': stats.area_edge.node / stats.t.current if stats.t.current > 0 else 0,
 
@@ -274,6 +264,7 @@ def better_scalability_simulation():
         'cloud_avg_service_time': cloud_service,
         'cloud_number': cloud_service,
         'cloud_utilization': cloud_utilization,
+        'cloud_weight_utilization': cloud_weight_utilization,
         'cloud_avg_number_node': stats.area_cloud.node / stats.t.current if stats.t.current > 0 else 0,
         'cloud_avg_number_queue': stats.area_cloud.queue / stats.t.current if stats.t.current > 0 else 0,
 
@@ -282,6 +273,7 @@ def better_scalability_simulation():
         'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
         'E_avg_number_queue_edge': stats.area_E.queue / stats.t.current if stats.t.current > 0 else 0,
         'E_edge_server_utilization': edge_utilizationE,
+        'edge_weight_utilizationE': edge_weight_utilizationE,
         'E_edge_server_service': edge_serviceE,
         'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
 
@@ -290,79 +282,7 @@ def better_scalability_simulation():
         'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
         'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
         'C_edge_server_utilization': edge_utilizationC,
+        'edge_weight_utilizationC': edge_weight_utilizationC,
         'C_edge_server_service': edge_serviceC,
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
-
-def check_available_server(events, servers, i):
-    found = 0
-    while i <= servers and found == 0:
-        if events[i].x == 0:
-            found = 1
-        i += 1
-    return found
-
-def GetLambda(current_time):
-    # 6:00 -> 10:00 | 16:00 -> 20:00 : high time slot
-    if 21600 <= current_time < 36000 or 57600 <= current_time < 72000:
-        return 2.7
-    # 10:00 -> 13:00 | 20:00 -> 23:00 : average time slot
-    elif 36000 <= current_time < 46800 or 72000 <= current_time < 82800:
-        return 1.4
-    # 13:00 -> 16:00 : low time slot
-    elif 46800 <= current_time < 57600:
-        return 0.8
-    # 23:00 -> 00:00 | 00:00 -> 6:00 -> : very low time slot
-    elif 82800 <= current_time < 86400 or 0 <= current_time < 21600:
-        return 0.2
-    # default
-    else:
-        return 1.4
-
-def AdjustServers(current_lambda, work_time, slot_time):
-    edge_utilization = current_lambda * 0.54
-    cloud_utilization = (current_lambda * 0.4) * 0.8
-
-    # conditions for adding server
-    # Edge node
-    if cs.EDGE_SERVERS < EDGE_SERVERS_MAX and edge_utilization / cs.EDGE_SERVERS > 0.8:  # add 1 server for utilization > 80%
-        increment_edge()
-        print(f"1 server added in the Edge node. Total: {cs.EDGE_SERVERS}")
-        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS)
-
-    # Cloud server
-    if cs.CLOUD_SERVERS < CLOUD_SERVERS_MAX and cloud_utilization / cs.CLOUD_SERVERS > 0.8:  # add 1 server for utilization > 80%
-        increment_cloud()
-        print(f"1 server added in the Cloud server. Total: {cs.CLOUD_SERVERS}")
-        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS)
-
-    # condition for removing server
-    # Edge node
-    if cs.EDGE_SERVERS > 1 and edge_utilization / cs.EDGE_SERVERS < 0.3:  # remove 1 server for utilization < 30%
-        decrement_edge()
-        print(f"1 server removed from Edge node. Total: {cs.EDGE_SERVERS}")
-
-    # Cloud server
-    if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
-        decrement_cloud()
-        print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
-
-    return work_time, slot_time
-
-def set_work_time (current_lambda, work_time, slot_time, num_server):
-    # this function calculates the fraction of work of a server based on slot time
-    if current_lambda == 2.7 and slot_time[num_server - 1].highSlotTime == 0:
-        slot_time[num_server - 1].highSlotTime = 1
-        work_time[num_server - 1] += 8/24
-    elif current_lambda == 1.4 and slot_time[num_server - 1].averageSlotTime == 0:
-        slot_time[num_server - 1].averageSlotTime = 1
-        work_time[num_server - 1] += 6/24
-    elif current_lambda == 0.8 and slot_time[num_server - 1].lowSlotTime == 0:
-        slot_time[num_server - 1].lowSlotTime = 1
-        work_time[num_server - 1] += 3/24
-    elif current_lambda == 0.2 and slot_time[num_server - 1].minSlotTime == 0:
-        slot_time[num_server - 1].minSlotTime = 1
-        work_time[num_server - 1] += 7/24
-
-    return work_time, slot_time
-

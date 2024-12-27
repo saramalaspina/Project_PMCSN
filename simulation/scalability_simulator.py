@@ -1,36 +1,10 @@
 from libraries.rngs import plantSeeds, getSeed
 from simulation.sim_utils import*
-from simulation.simulation_stats import SimulationStats
+from simulation.simulation_stats import *
 from simulation.simulation_output import *
 import utils.constants as cs
 
 plantSeeds(SEED)
-
-class event:
-    t = None  # next event time
-    x = None  # event status, 0 or 1
-    type = None # "E" if job E, "C" if job C in service
-
-
-class time:
-    current = None  # current time                       */
-    next = None  # next (most imminent) event time    */
-
-
-class accumSum:
-    # accumulated sums of                */
-    service = None  # service times                    */
-    serviceE = None
-    serviceC = None
-    served = None # number served                    */
-    servedE = None  # number type E served                    */
-    servedC = None # number type C served                    */
-
-class slotTime:
-    highSlotTime = 0
-    averageSlotTime = 0
-    lowSlotTime = 0
-    minSlotTime = 0
 
 def scalability_simulation():
     seed = getSeed()
@@ -316,76 +290,4 @@ def scalability_simulation():
         'C_edge_server_service': edge_serviceC,
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
-
-def check_available_server(events, servers, i):
-    found = 0
-    while i <= servers and found == 0:
-        if events[i].x == 0:
-            found = 1
-        i += 1
-    return found
-
-def GetLambda(current_time):
-    # 6:00 -> 10:00 | 16:00 -> 20:00 : high time slot
-    if 21600 <= current_time < 36000 or 57600 <= current_time < 72000:
-        return 2.7
-    # 10:00 -> 13:00 | 20:00 -> 23:00 : average time slot
-    elif 36000 <= current_time < 46800 or 72000 <= current_time < 82800:
-        return 1.4
-    # 13:00 -> 16:00 : low time slot
-    elif 46800 <= current_time < 57600:
-        return 0.8
-    # 23:00 -> 00:00 | 00:00 -> 6:00 -> : very low time slot
-    elif 82800 <= current_time < 86400 or 0 <= current_time < 21600:
-        return 0.2
-    # default
-    else:
-        return 1.4
-
-def AdjustServers(current_lambda, work_time, slot_time):
-    edge_utilization = current_lambda * 0.54
-    cloud_utilization = (current_lambda * 0.4) * 0.8
-
-    # conditions for adding server
-    # Edge node
-    if cs.EDGE_SERVERS < EDGE_SERVERS_MAX and edge_utilization / cs.EDGE_SERVERS > 0.8:  # add 1 server for utilization > 80%
-        increment_edge()
-        print(f"1 server added in the Edge node. Total: {cs.EDGE_SERVERS}")
-        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS)
-
-    # Cloud server
-    if cs.CLOUD_SERVERS < CLOUD_SERVERS_MAX and cloud_utilization / cs.CLOUD_SERVERS > 0.8:  # add 1 server for utilization > 80%
-        increment_cloud()
-        print(f"1 server added in the Cloud server. Total: {cs.CLOUD_SERVERS}")
-        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS)
-
-    # condition for removing server
-    # Edge node
-    if cs.EDGE_SERVERS > 1 and edge_utilization / cs.EDGE_SERVERS < 0.3:  # remove 1 server for utilization < 30%
-        decrement_edge()
-        print(f"1 server removed from Edge node. Total: {cs.EDGE_SERVERS}")
-
-    # Cloud server
-    if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
-        decrement_cloud()
-        print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
-
-    return work_time, slot_time
-
-def set_work_time (current_lambda, work_time, slot_time, num_server):
-    # this function calculates the fraction of work of a server based on slot time
-    if current_lambda == 2.7 and slot_time[num_server - 1].highSlotTime == 0:
-        slot_time[num_server - 1].highSlotTime = 1
-        work_time[num_server - 1] += 8/24
-    elif current_lambda == 1.4 and slot_time[num_server - 1].averageSlotTime == 0:
-        slot_time[num_server - 1].averageSlotTime = 1
-        work_time[num_server - 1] += 6/24
-    elif current_lambda == 0.8 and slot_time[num_server - 1].lowSlotTime == 0:
-        slot_time[num_server - 1].lowSlotTime = 1
-        work_time[num_server - 1] += 3/24
-    elif current_lambda == 0.2 and slot_time[num_server - 1].minSlotTime == 0:
-        slot_time[num_server - 1].minSlotTime = 1
-        work_time[num_server - 1] += 7/24
-
-    return work_time, slot_time
 

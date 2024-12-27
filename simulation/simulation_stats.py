@@ -107,4 +107,29 @@ class ReplicationStats:
         self.C_edge_number_node = []
         self.C_edge_number_queue = []
 
+class event:
+    t = None  # next event time
+    x = None  # event status, 0 or 1
+    type = None # "E" if job E, "C" if job C in service
+
+
+class time:
+    current = None  # current time                       */
+    next = None  # next (most imminent) event time    */
+
+
+class accumSum:
+    # accumulated sums of                */
+    service = None  # service times                    */
+    serviceE = None
+    serviceC = None
+    served = None  # number served                    */
+    servedE = None  # number type E served                    */
+    servedC = None  # number type C served                    */
+
+class slotTime:
+    highSlotTime = 0
+    averageSlotTime = 0
+    lowSlotTime = 0
+    minSlotTime = 0
 
