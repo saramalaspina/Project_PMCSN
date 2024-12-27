@@ -348,8 +348,3 @@ def AdjustServers(stats, sum, current_lambda):
     if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
         decrement_cloud()
         print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
-
-    if 10000 <= stats.t.current <= 10200 or 30000 <= stats.t.current <= 30200 or 40000 <= stats.t.current <= 40200 or 50000 <= stats.t.current <= 50200 or 65000 <=stats.t.current <= 65200 or 75000 <=stats.t.current <= 75200 or 84000 <=stats.t.current <= 84200:
-        print(f"current time: {stats.t.current}")
-        print(f"edge utilization: {edge_utilization / cs.EDGE_SERVERS} cloud utilization: {cloud_utilization / cs.CLOUD_SERVERS}")
-        print(f"server in the edge: {cs.EDGE_SERVERS} ; server in the cloud {cs.CLOUD_SERVERS}")

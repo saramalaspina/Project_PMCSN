@@ -81,16 +81,20 @@ def print_scalability_simulation_stats(stats):
 
     # flat the list
     flat_edge_service = list(itertools.chain.from_iterable(stats.edge_service_times))
-    flat_edge_utilization = list(itertools.chain.from_iterable(stats.edge_utilization))
+    #flat_edge_utilization = list(itertools.chain.from_iterable(stats.edge_utilization))
+    flat_edge_utilization = [value for sublist in stats.edge_utilization for value in sublist if value != 0]
 
     flat_edge_serviceE = list(itertools.chain.from_iterable(stats.E_edge_service_times))
-    flat_edge_utilizationE = list(itertools.chain.from_iterable(stats.E_edge_utilization))
+    #flat_edge_utilizationE = list(itertools.chain.from_iterable(stats.E_edge_utilization))
+    flat_edge_utilizationE = [value for sublist in stats.E_edge_utilization for value in sublist if value != 0]
 
     flat_edge_serviceC = list(itertools.chain.from_iterable(stats.C_edge_service_times))
-    flat_edge_utilizationC = list(itertools.chain.from_iterable(stats.C_edge_utilization))
+    #flat_edge_utilizationC = list(itertools.chain.from_iterable(stats.C_edge_utilization))
+    flat_edge_utilizationC = [value for sublist in stats.C_edge_utilization for value in sublist if value != 0]
 
     flat_cloud_service = list(itertools.chain.from_iterable(stats.cloud_service_times))
-    flat_cloud_utilization = list(itertools.chain.from_iterable(stats.cloud_utilization))
+    #flat_cloud_utilization = list(itertools.chain.from_iterable(stats.cloud_utilization))
+    flat_cloud_utilization = [value for sublist in stats.cloud_utilization for value in sublist if value != 0]
 
     print(f"Edge Node - Average wait time: {statistics.mean(stats.edge_wait_times):.6f} ± {calculate_confidence_interval(stats.edge_wait_times):.6f}")
     print(f"Edge Node - Average delay time: {statistics.mean(stats.edge_delays):.6f} ± {calculate_confidence_interval(stats.edge_delays):.6f}")
