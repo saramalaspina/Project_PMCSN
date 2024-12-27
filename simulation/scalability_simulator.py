@@ -26,6 +26,12 @@ class accumSum:
     servedE = None  # number type E served                    */
     servedC = None # number type C served                    */
 
+class slotTime:
+    highSlotTime = 0
+    averageSlotTime = 0
+    lowSlotTime = 0
+    minSlotTime = 0
+
 def scalability_simulation():
     seed = getSeed()
     set_servers(1,1)
@@ -40,6 +46,12 @@ def scalability_simulation():
     sum = [accumSum() for i in range(0, EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX + 1)]
 
     cloud_queue = 0
+    work_time = [0] * (EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)
+
+    work_time[0] = 1 # at least one server at edge node is always allocated (100%)
+    work_time[EDGE_SERVERS_MAX] = 1 # at least one server at cloud server is always allocated (100%)
+
+    slot_time = [slotTime() for i in range(EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)]
 
     current_lambda = GetLambda(stats.t.current)  # update λ based on current time
 
@@ -58,7 +70,7 @@ def scalability_simulation():
 
     while ((events[0].x != 0) or (stats.number_edge + stats.number_cloud > 0)):
         current_lambda = GetLambda(stats.t.current)
-        AdjustServers(stats, sum, current_lambda)
+        work_time, slot_time = AdjustServers(current_lambda, work_time, slot_time)
         e = NextEvent(events)
 
         stats.t.next = events[e].t # next event time  */
@@ -222,16 +234,20 @@ def scalability_simulation():
     edge_num_server = []
     edge_service = []
     edge_utilization = []
+    edge_weight_utilization = []
 
     edge_serviceE = []
     edge_utilizationE = []
+    edge_weight_utilizationE = []
 
     edge_serviceC = []
     edge_utilizationC = []
+    edge_weight_utilizationC = []
 
     cloud_num_server = []
     cloud_service = []
     cloud_utilization = []
+    cloud_weight_utilization = []
 
     # stats of each server at edge node for job of type E and C
     for s in range(1, EDGE_SERVERS_MAX + 1):
@@ -254,6 +270,14 @@ def scalability_simulation():
         cloud_service = [0] * CLOUD_SERVERS_MAX
         cloud_utilization = [0] * CLOUD_SERVERS_MAX
 
+    for s in range(0, EDGE_SERVERS_MAX):
+        edge_weight_utilization.append(edge_utilization[s] * work_time[s])
+        edge_weight_utilizationE.append(edge_utilizationE[s] * work_time[s])
+        edge_weight_utilizationC.append(edge_utilizationC[s] * work_time[s])
+
+    for s in range(0, CLOUD_SERVERS_MAX):
+        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s])
+
     return {
         'seed': seed,
         'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
@@ -261,6 +285,7 @@ def scalability_simulation():
         'edge_avg_number_queue': stats.area_edge.queue / stats.t.current if stats.t.current > 0 else 0,
         'edge_server_number': edge_num_server,
         'edge_server_utilization': edge_utilization,
+        'edge_weight_utilization': edge_weight_utilization,
         'edge_server_service': edge_service,
         'edge_avg_number_node': stats.area_edge.node / stats.t.current if stats.t.current > 0 else 0,
 
@@ -269,6 +294,7 @@ def scalability_simulation():
         'cloud_avg_service_time': cloud_service,
         'cloud_number': cloud_num_server,
         'cloud_utilization': cloud_utilization,
+        'cloud_weight_utilization': cloud_weight_utilization,
         'cloud_avg_number_node': stats.area_cloud.node / stats.t.current if stats.t.current > 0 else 0,
         'cloud_avg_number_queue': stats.area_cloud.queue / stats.t.current if stats.t.current > 0 else 0,
 
@@ -277,6 +303,7 @@ def scalability_simulation():
         'E_avg_delay': stats.area_E.queue / stats.index_E if stats.index_E > 0 else 0,
         'E_avg_number_queue_edge': stats.area_E.queue / stats.t.current if stats.t.current > 0 else 0,
         'E_edge_server_utilization': edge_utilizationE,
+        'edge_weight_utilizationE': edge_weight_utilizationE,
         'E_edge_server_service': edge_serviceE,
         'E_avg_number_edge': stats.area_E.node / stats.t.current if stats.t.current > 0 else 0,
 
@@ -285,6 +312,7 @@ def scalability_simulation():
         'C_avg_delay': stats.area_C.queue / stats.index_C if stats.index_C > 0 else 0,
         'C_avg_number_queue_edge': stats.area_C.queue / stats.t.current if stats.t.current > 0 else 0,
         'C_edge_server_utilization': edge_utilizationC,
+        'edge_weight_utilizationC': edge_weight_utilizationC,
         'C_edge_server_service': edge_serviceC,
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
@@ -314,29 +342,22 @@ def GetLambda(current_time):
     else:
         return 1.4
 
-def AdjustServers(stats, sum, current_lambda):
+def AdjustServers(current_lambda, work_time, slot_time):
     edge_utilization = current_lambda * 0.54
     cloud_utilization = (current_lambda * 0.4) * 0.8
-
-    # calculation of the sum of server utilization in the edge node
-    # for s in range(1, cs.EDGE_SERVERS + 1):
-        # edge_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
-
-    # calculation of the sum of server utilization in the cloud server
-    # for s in range(EDGE_SERVERS_MAX + 1, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS + 1):
-        # cloud_utilization += sum[s].service / stats.t.current if stats.t.current > 0 else 0
-
 
     # conditions for adding server
     # Edge node
     if cs.EDGE_SERVERS < EDGE_SERVERS_MAX and edge_utilization / cs.EDGE_SERVERS > 0.8:  # add 1 server for utilization > 80%
         increment_edge()
         print(f"1 server added in the Edge node. Total: {cs.EDGE_SERVERS}")
+        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS)
 
     # Cloud server
     if cs.CLOUD_SERVERS < CLOUD_SERVERS_MAX and cloud_utilization / cs.CLOUD_SERVERS > 0.8:  # add 1 server for utilization > 80%
         increment_cloud()
         print(f"1 server added in the Cloud server. Total: {cs.CLOUD_SERVERS}")
+        work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS)
 
     # condition for removing server
     # Edge node
@@ -348,3 +369,23 @@ def AdjustServers(stats, sum, current_lambda):
     if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
         decrement_cloud()
         print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
+
+    return work_time, slot_time
+
+def set_work_time (current_lambda, work_time, slot_time, num_server):
+    # this function calculates the fraction of work of a server based on slot time
+    if current_lambda == 2.7 and slot_time[num_server - 1].highSlotTime == 0:
+        slot_time[num_server - 1].highSlotTime = 1
+        work_time[num_server - 1] += 8/24
+    elif current_lambda == 1.4 and slot_time[num_server - 1].averageSlotTime == 0:
+        slot_time[num_server - 1].averageSlotTime = 1
+        work_time[num_server - 1] += 6/24
+    elif current_lambda == 0.8 and slot_time[num_server - 1].lowSlotTime == 0:
+        slot_time[num_server - 1].lowSlotTime = 1
+        work_time[num_server - 1] += 3/24
+    elif current_lambda == 0.2 and slot_time[num_server - 1].minSlotTime == 0:
+        slot_time[num_server - 1].minSlotTime = 1
+        work_time[num_server - 1] += 7/24
+
+    return work_time, slot_time
+

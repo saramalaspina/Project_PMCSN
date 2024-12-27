@@ -106,3 +106,5 @@ class ReplicationStats:
         self.C_edge_utilization = []
         self.C_edge_number_node = []
         self.C_edge_number_queue = []
+
+

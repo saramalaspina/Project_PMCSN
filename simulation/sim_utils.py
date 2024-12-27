@@ -148,14 +148,14 @@ def append_scalability_stats(replicationStats, results):
     replicationStats.edge_wait_times.append(results['edge_avg_wait'])
     replicationStats.edge_delays.append(results['edge_avg_delay'])
     replicationStats.edge_service_times.append(results['edge_server_service'])
-    replicationStats.edge_utilization.append(results['edge_server_utilization'])
+    replicationStats.edge_utilization.append(results['edge_weight_utilization'])
     replicationStats.edge_number_node.append(results['edge_avg_number_node'])
     replicationStats.edge_number_queue.append(results['edge_avg_number_queue'])
 
     replicationStats.cloud_wait_times.append(results['cloud_avg_wait'])
     replicationStats.cloud_delays.append(results['cloud_avg_delay'])
     replicationStats.cloud_service_times.append(results['cloud_avg_service_time'])
-    replicationStats.cloud_utilization.append(results['cloud_utilization'])
+    replicationStats.cloud_utilization.append(results['cloud_weight_utilization'])
     replicationStats.cloud_number_node.append(results['cloud_avg_number_node'])
     replicationStats.cloud_number_queue.append(results['cloud_avg_number_queue'])
 
@@ -163,7 +163,7 @@ def append_scalability_stats(replicationStats, results):
     replicationStats.E_edge_wait_times.append(results['E_avg_wait'])
     replicationStats.E_edge_delays.append(results['E_avg_delay'])
     replicationStats.E_edge_service_times.append(results['E_edge_server_service'])
-    replicationStats.E_edge_utilization.append(results['E_edge_server_utilization'])
+    replicationStats.E_edge_utilization.append(results['edge_weight_utilizationE'])
     replicationStats.E_edge_number_node.append(results['E_avg_number_edge'])
     replicationStats.E_edge_number_queue.append(results['E_avg_number_queue_edge'])
 
@@ -171,7 +171,7 @@ def append_scalability_stats(replicationStats, results):
     replicationStats.C_edge_wait_times.append(results['C_avg_wait'])
     replicationStats.C_edge_delays.append(results['C_avg_delay'])
     replicationStats.C_edge_service_times.append(results['C_edge_server_service'])
-    replicationStats.C_edge_utilization.append(results['C_edge_server_utilization'])
+    replicationStats.C_edge_utilization.append(results['edge_weight_utilizationC'])
     replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
     replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
 
