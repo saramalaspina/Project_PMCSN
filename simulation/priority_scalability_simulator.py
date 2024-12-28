@@ -45,7 +45,6 @@ def better_scalability_simulation():
         sum[s].serviceC = 0.0
 
     while ((events[0].x != 0) or (stats.number_edge + stats.number_cloud > 0)):
-        print(f"{stats.t.current}")
         current_lambda = GetLambda(stats.t.current)
         work_time, slot_time = AdjustServers(current_lambda, work_time, slot_time)
         e = NextEvent(events)  # next event index */
@@ -120,7 +119,7 @@ def better_scalability_simulation():
             stats.number_edge -= 1
             s = e
             if s <= cs.EDGE_SERVERS:
-                if len(stats.queue_edge) != 0:
+                if stats.queue_edge_E + stats.queue_edge_C != 0:
                     if stats.queue_edge_E:
                         service = GetServiceEdgeE()
                         events[s].type = "E"
@@ -141,7 +140,6 @@ def better_scalability_simulation():
                     events[s].x = 0
             else:
                 events[s].x = 0
-
         elif EDGE_SERVERS_MAX + 1 <= e <= CLOUD_SERVERS_MAX + EDGE_SERVERS_MAX: # completion at cloud server
             stats.index_cloud += 1
             stats.number_cloud -= 1
