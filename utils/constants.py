@@ -31,7 +31,7 @@ P_C = 0.4
 
 SEED = 123456789
 
-REPLICATIONS = 10
+REPLICATIONS = 7
 
 INFINITE = 0
 FINITE = 1
@@ -44,13 +44,14 @@ BETTER_SCALABILITY = 3
 MODEL = STANDARD
 
 START = 0.0  # initial time
-STOP = 86400.00  # terminal (close the door) time
+#STOP = 86400.00  # terminal (close the door) time
+STOP = 300000  # terminal (close the door) time
 STOP_INFINITE = float('inf')
 INFINITY = float('inf')  # must be much larger than STOP
 
 EXPONENTIAL = 0
 TRUNCATED_NORMAL = 1
-SERVICE_DISTRIBUTION = TRUNCATED_NORMAL
+SERVICE_DISTRIBUTION = EXPONENTIAL
 
 ALPHA = 0.05 # 95% confidence
 

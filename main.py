@@ -2,6 +2,7 @@ from simulation.priority_scalability_simulator import better_scalability_simulat
 from simulation.priority_simulator import *
 from simulation.scalability_simulator import scalability_simulation
 from simulation.simulator import *
+import matplotlib.pyplot as plt
 
 
 def start_simulation():
@@ -16,6 +17,8 @@ def start_simulation():
 
 def start_finite_simulation():
     replicationStats = ReplicationStats()
+    rep_response_times = []
+    seeds = []
 
     if MODEL == STANDARD:
         file_name = "finite_statistics.csv"
@@ -37,9 +40,11 @@ def start_finite_simulation():
 
     for i in range(REPLICATIONS):
         if MODEL == STANDARD:
-            results = finite_simulation()
+            results, response_times = finite_simulation()
             write_file(results, file_name)
+            seeds.append(results["seed"])
             append_stats(replicationStats, results)
+            rep_response_times.append(response_times)
             type = "replications"
         elif MODEL == BETTER:
             results = better_finite_simulation()
@@ -61,6 +66,25 @@ def start_finite_simulation():
         print_simulation_stats(replicationStats, type)
     elif type == "scalability":
         print_scalability_simulation_stats(replicationStats)
+
+    plt.figure(figsize=(10, 6))
+
+    # Plot each run
+    for run_index, response_times in enumerate(rep_response_times):
+        times = [point[0] for point in response_times]
+        avg_response_times = [point[1] for point in response_times]
+        plt.plot(times, avg_response_times, label=f'Seed {seeds[run_index]}')
+
+    # Aggiungi etichette, titolo, legenda e griglia
+    plt.xlabel('Tempo (secondi)')
+    plt.ylabel('Tempo di risposta (secondi)')
+    plt.title('Analisi del transitorio')
+    plt.legend()
+    plt.grid(True)
+
+    # Mostra il grafico
+    plt.show()
+
 
 def start_infinite_simulation():
     if MODEL == STANDARD:

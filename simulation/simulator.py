@@ -5,7 +5,11 @@ from simulation.simulation_output import *
 from utils.constants import*
 from simulation.simulation_stats import*
 
-plantSeeds(SEED) #la faccio nel main
+plantSeeds(SEED)
+
+response_times = []  # Lista per salvare i dati
+time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint temporali ogni 1000 secondi
+current_checkpoint = 0  # Indicatore del checkpoint corrente
 
 # stream 0 -> arrivi dall'esterno
 # stream 1 -> servizio dell'edge tipo E
@@ -14,6 +18,9 @@ plantSeeds(SEED) #la faccio nel main
 # stream 4 -> servizio dell'edge tipo C
 
 def finite_simulation():
+    global  current_checkpoint, response_times
+    response_times = []
+    current_checkpoint = 0
     s = getSeed()
     reset_arrival_temp()
 
@@ -22,11 +29,19 @@ def finite_simulation():
 
     while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
         execute(stats, STOP)
+        if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
+            # Calcola il tempo di risposta medio (o altri dati rilevanti)
+            #avg_response_time = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
+            #avg_response_time = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
+            #avg_response_time = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
+            avg_response_time = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
+            response_times.append((stats.t.current, avg_response_time))
+            current_checkpoint += 1
 
     stats.calculate_area_queue()
 
     # Collect and return the results
-    return return_stats(stats, stats.t.current, s)
+    return return_stats(stats, stats.t.current, s), response_times
 
 
 def infinite_simulation(B, K):

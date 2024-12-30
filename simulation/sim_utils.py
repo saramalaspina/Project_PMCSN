@@ -67,7 +67,7 @@ def GetServiceEdgeE():
     if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
         return Exponential(0.5)
     elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.5, 2/6, 0, 2)
+        return idfTruncatedNormal(0.5, 0.1, 0, 2)
 
 
 def GetServiceEdgeC():
@@ -76,7 +76,7 @@ def GetServiceEdgeC():
     if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
         return Exponential(0.1)
     elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.1, 1/6, 0, 1)
+        return idfTruncatedNormal(0.1, 0.1, 0, 1)
 
 
 def GetServiceCloud():
@@ -85,7 +85,7 @@ def GetServiceCloud():
     if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
         return Exponential(0.8)
     elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.8, 3/ 6, 0, 3)
+        return idfTruncatedNormal(0.8, 0.1, 0, 3)
 
 
 def calculate_confidence_interval(data):
