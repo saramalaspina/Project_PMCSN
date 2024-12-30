@@ -166,7 +166,7 @@ def idfGeometric(p,u):
   # ========================================= 
   # * NOTE: use 0.0 < p < 1.0 and 0.0 < u < 1.0 
   # * =========================================
-  return ((long) (log(1.0 - u) / log(p)))
+  return (log(1.0 - u) / log(p))
 
 
 def pdfPascal(n,p,x):

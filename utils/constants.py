@@ -41,12 +41,16 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = BETTER_SCALABILITY
+MODEL = STANDARD
 
 START = 0.0  # initial time
 STOP = 86400.00  # terminal (close the door) time
 STOP_INFINITE = float('inf')
 INFINITY = float('inf')  # must be much larger than STOP
+
+EXPONENTIAL = 0
+TRUNCATED_NORMAL = 1
+SERVICE_DISTRIBUTION = TRUNCATED_NORMAL
 
 ALPHA = 0.05 # 95% confidence
 

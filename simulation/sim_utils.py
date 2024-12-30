@@ -17,6 +17,7 @@ service_rates = {
     'cloud_server': 0.8
 }
 
+
 def Min(a, b, c):
     """Return the smallest of a, b, c."""
     return min(a, b, c)
@@ -32,6 +33,13 @@ def Uniform(a, b):
     return (a + (b - a) * random())
 
 
+def idfTruncatedNormal(m, s, a, b):
+    alpha = rvms.cdfNormal(m, s, a)          # a = 0
+    beta = 1.0 - rvms.cdfNormal(m, s, b)     # b = 2
+    u = rvms.idfUniform(alpha, 1.0 - beta, random())
+    return rvms.idfNormal(m, s, u)
+
+
 def GetArrival():
     """Generate the next arrival time for the first server."""
     global arrivalTemp
@@ -39,12 +47,14 @@ def GetArrival():
     arrivalTemp += Exponential(1 / cs.LAMBDA)
     return arrivalTemp
 
+
 def GetArrivalWithLambda(current_lambda):
     """Generate the next arrival time with a dynamic lambda."""
     global arrivalTemp
     selectStream(0)
     arrivalTemp += Exponential(1 / current_lambda)
     return arrivalTemp
+
 
 def reset_arrival_temp():
     global arrivalTemp
@@ -54,17 +64,29 @@ def reset_arrival_temp():
 def GetServiceEdgeE():
     """Generate the next service time for both servers."""
     selectStream(1)
-    return Exponential(0.5)
+    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
+        return Exponential(0.5)
+    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
+        return idfTruncatedNormal(0.5, 2/6, 0, 2)
+
 
 def GetServiceEdgeC():
     """Generate the second service time at the edge after returning from the cloud."""
     selectStream(4)
-    return Exponential(0.1)
+    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
+        return Exponential(0.1)
+    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
+        return idfTruncatedNormal(0.1, 1/6, 0, 1)
+
 
 def GetServiceCloud():
     """Generate the next service time for both servers."""
     selectStream(2)
-    return Exponential(0.8)
+    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
+        return Exponential(0.8)
+    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
+        return idfTruncatedNormal(0.8, 3/ 6, 0, 3)
+
 
 def calculate_confidence_interval(data):
     n = len(data)
@@ -84,6 +106,7 @@ def calculate_confidence_interval(data):
     margin_of_error = t_star * standard_deviation / math.sqrt(n - 1)
 
     return margin_of_error
+
 
 def NextEvent(events):
     i = 0
@@ -110,6 +133,7 @@ def FindOne(events, servers, i):
             s = i
     # EndWhile
     return (s)
+
 
 def append_stats(replicationStats, results):
     # append stats in the list
@@ -142,6 +166,7 @@ def append_stats(replicationStats, results):
     replicationStats.C_edge_utilization.append(results['C_utilization'])
     replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
     replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
+
 
 def append_scalability_stats(replicationStats, results):
     # append stats in the list
