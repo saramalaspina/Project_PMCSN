@@ -95,14 +95,15 @@ def start_infinite_simulation():
     clear_file(file_name)
 
     if MODEL == STANDARD:
-        batch_stats = infinite_simulation(B, K)
+        batch_stats = infinite_simulation()
         print("INFINITE STANDARD SIMULATION")
     else:
-        batch_stats = better_infinite_simulation(B, K)
+        batch_stats = better_infinite_simulation()
         print("INFINITE BETTER SIMULATION")
 
     type = "batch"
     print_simulation_stats(batch_stats, type)
+    print_autocorrelation(file_name)
 
 start_simulation()
 

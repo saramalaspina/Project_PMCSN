@@ -32,9 +32,8 @@
 import sys
 from math import sqrt
 
-K = 50                             # K is the maximum lag */
-SIZE = (K + 1)
-
+LAG_K = 50  # K is the maximum lag */
+SIZE = (LAG_K + 1)
 
 i = 0                          # data point index              */
 sum = 0.0                      # sums x[i]                     */
@@ -51,7 +50,7 @@ while (i < SIZE):              # initialize the hold array with */
   i += 1
 #EndWhile
 
-x = sys.stdin.readline()   
+x = sys.stdin.readline()
 
 while (x):
   for j in range(0,SIZE):
@@ -60,7 +59,7 @@ while (x):
   sum    += x
   hold[p] = x
   p       = (p + 1) % SIZE
-  i += 1 
+  i += 1
   x = sys.stdin.readline()
 #EndWhile
 n = i #the total number of data points
@@ -70,11 +69,11 @@ while (i < n + SIZE):         # empty the circular array */
     cosum[j] += hold[p] * hold[(p + j) % SIZE]
   hold[p] = 0.0
   p       = (p + 1) % SIZE
-  i += 1 
+  i += 1
 #EndWhile
 
 mean = sum / n
-for j in range(0,K+1):  
+for j in range(0, LAG_K + 1):
   cosum[j] = (cosum[j] / (n - j)) - (mean * mean)
 
 print("for {0} data points".format(n))
@@ -141,3 +140,4 @@ for j in range(1,SIZE):
 #  48        0.053
 #  49        0.052
 #  50        0.050
+

@@ -30,7 +30,7 @@ def better_finite_simulation():
     return return_stats(stats, stats.t.current, s)
 
 
-def better_infinite_simulation(B, K):
+def better_infinite_simulation():
     s = getSeed()
 
     start_time = 0

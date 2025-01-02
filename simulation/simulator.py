@@ -1,14 +1,14 @@
-from math import log
 from libraries.rngs import * # Multi-stream generator
 from simulation.sim_utils import*
 from simulation.simulation_output import *
 from utils.constants import*
 from simulation.simulation_stats import*
 
+
 plantSeeds(SEED)
 
 response_times = []  # Lista per salvare i dati
-time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint temporali ogni 1000 secondi
+time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint temporali ogni 1000 secondi
 current_checkpoint = 0  # Indicatore del checkpoint corrente
 
 # stream 0 -> arrivi dall'esterno
@@ -44,13 +44,14 @@ def finite_simulation():
     return return_stats(stats, stats.t.current, s), response_times
 
 
-def infinite_simulation(B, K):
+def infinite_simulation():
     s = getSeed()
 
     start_time = 0
 
     batch_stats = ReplicationStats()
     stats = SimulationStats()
+    stats.reset(START)  # reset stats
 
     while len(batch_stats.edge_wait_times) < K:
 
@@ -58,11 +59,13 @@ def infinite_simulation(B, K):
             execute(stats, STOP_INFINITE)
         stop_time = stats.t.current - start_time
         start_time = stats.t.current
+        stats.calculate_area_queue()
         results = return_stats(stats, stop_time, s)
         write_file(results, "infinite_statistics.csv")
         append_stats(batch_stats, results)
         stats.reset_infinite()
 
+    remove_batch(batch_stats, 25)
     return batch_stats
 
 def execute(stats, stop):
@@ -189,6 +192,15 @@ def return_stats(stats, t, s):
         'C_avg_number_queue_edge': stats.area_C.queue / t if t > 0 else 0,
         'C_utilization': stats.area_C.service / t if t > 0 else 0
     }
+
+
+def remove_batch(stats, n):
+    if n < 0:
+        raise ValueError()
+    for attr in dir(stats):
+        value = getattr(stats, attr)
+        if isinstance(value, list):
+            setattr(stats, attr, value[n:])
 
 
 

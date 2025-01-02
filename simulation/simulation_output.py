@@ -3,6 +3,8 @@ import itertools
 import csv
 from simulation.sim_utils import calculate_confidence_interval
 from utils.constants import *
+from simulation.autocorrelation import *
+import pandas as pd
 
 file_path = "simulation/../output/"
 
@@ -157,6 +159,44 @@ def print_simulation_stats(stats, type):
     print(f"Utilization for C jobs: {statistics.mean(stats.C_edge_utilization):.6f} ± {calculate_confidence_interval(stats.C_edge_utilization):.6f}")
     print(f"Average number of C jobs in the node (edge/cloud): {statistics.mean(stats.C_edge_number_node):.6f} ± {calculate_confidence_interval(stats.C_edge_number_node):.6f}")
     print(f"Average number of C in the (cloud) queue: {statistics.mean(stats.C_edge_number_queue):.6f} ± {calculate_confidence_interval(stats.C_edge_number_queue):.6f}")
+
+def print_autocorrelation(file_name):
+    data = pd.read_csv(f"{file_path}{file_name}")
+    columns_edge = ["edge_avg_wait", "edge_avg_delay", "edge_avg_service_time", "edge_utilization", "edge_avg_number_node", "edge_avg_number_queue"]
+    columns_cloud = ["cloud_avg_wait", "cloud_avg_delay","cloud_avg_service_time","cloud_utilization", "cloud_avg_number_node", "cloud_avg_number_queue"]
+    columns_E = ["E_avg_wait", "E_avg_delay", "E_avg_service_time", "E_utilization", "E_avg_number_edge","E_avg_number_queue_edge"]
+    columns_C= ["C_avg_wait", "C_avg_delay", "C_avg_service_time", "C_utilization","C_avg_number_edge","C_avg_number_queue_edge"]
+    print("\nAutocorrelation Edge Node")
+    for col in columns_edge:
+        try:
+            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+            print(f"{col}: {autocorr[0]}")
+        except Exception as e:
+            print(f"Error {col}: {e}")
+
+    print("\nAutocorrelation Cloud Server")
+    for col in columns_cloud:
+        try:
+            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+            print(f"{col}: {autocorr[0]}")
+        except Exception as e:
+            print(f"Error {col}: {e}")
+
+    print("\nAutocorrelation Edge Node type E jobs")
+    for col in columns_E:
+        try:
+            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+            print(f"{col}: {autocorr[0]}")
+        except Exception as e:
+            print(f"Error {col}: {e}")
+
+    print("\nAutocorrelation Edge Node type C jobs")
+    for col in columns_C:
+        try:
+            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+            print(f"{col}: {autocorr[0]}")
+        except Exception as e:
+            print(f"Error {col}: {e}")
 
 
 def write_file(results, file_name):

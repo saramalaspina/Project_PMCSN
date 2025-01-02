@@ -27,7 +27,7 @@ def set_servers(edge_num, cloud_num):
     EDGE_SERVERS = edge_num
     CLOUD_SERVERS = cloud_num
 
-P_C = 0.4
+P_C = 0
 
 SEED = 123456789
 
@@ -35,7 +35,7 @@ REPLICATIONS = 7
 
 INFINITE = 0
 FINITE = 1
-SIMULATION_TYPE = FINITE
+SIMULATION_TYPE = INFINITE
 
 BETTER = 0
 STANDARD = 1
@@ -44,8 +44,8 @@ BETTER_SCALABILITY = 3
 MODEL = STANDARD
 
 START = 0.0  # initial time
-#STOP = 86400.00  # terminal (close the door) time
-STOP = 300000  # terminal (close the door) time
+STOP = 86400  # terminal (close the door) time
+STOP_ANALYSIS = 300000
 STOP_INFINITE = float('inf')
 INFINITY = float('inf')  # must be much larger than STOP
 
@@ -56,4 +56,4 @@ SERVICE_DISTRIBUTION = EXPONENTIAL
 ALPHA = 0.05 # 95% confidence
 
 K = 96
-B = 1096
+B = 1080
