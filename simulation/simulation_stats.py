@@ -42,11 +42,20 @@ class SimulationStats:
         self.t = Time()
         self.queue_edge = [] # A list to track the type of jobs waiting at the edge node
 
+        self.edge_wait_times = []
+        self.cloud_wait_times = []
+        self.E_wait_times = []
+        self.C_wait_times = []
+
     def reset(self, start_time):
         self.t.current = start_time
         self.t.completion_edge = float('inf')
         self.t.completion_cloud = float('inf')
         self.queue_edge.clear()  # Svuota la coda
+        self.edge_wait_times.clear()
+        self.cloud_wait_times.clear()
+        self.E_wait_times.clear()
+        self.C_wait_times.clear()
 
     def reset_infinite(self):
         self.job_arrived = 0  # used to count arrived jobs
@@ -72,6 +81,7 @@ class SimulationStats:
 
 class ReplicationStats:
     def __init__(self):
+        self.seeds = []
         self.edge_num_server = []
 
         self.edge_wait_times = []
@@ -106,6 +116,11 @@ class ReplicationStats:
         self.C_edge_utilization = []
         self.C_edge_number_node = []
         self.C_edge_number_queue = []
+
+        self.edge_wait_interval = []
+        self.cloud_wait_interval = []
+        self.E_wait_interval = []
+        self.C_wait_interval = []
 
 class event:
     t = None  # next event time

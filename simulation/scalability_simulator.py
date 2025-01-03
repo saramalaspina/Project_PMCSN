@@ -6,7 +6,13 @@ import utils.constants as cs
 
 plantSeeds(SEED)
 
-def scalability_simulation():
+time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint temporali ogni 1000 secondi
+current_checkpoint = 0  # Indicatore del checkpoint corrente
+
+def scalability_simulation(stop):
+    global current_checkpoint
+    current_checkpoint = 0
+
     seed = getSeed()
     set_servers(1,1)
     reset_arrival_temp()
@@ -72,7 +78,7 @@ def scalability_simulation():
             stats.number_E += 1
             stats.queue_edge.append("E")
             events[0].t = GetArrivalWithLambda(current_lambda)
-            if (events[0].t > STOP):
+            if (events[0].t > stop):
                 events[0].x = 0
                 stats.t.last = stats.t.current
             # EndIf
@@ -187,6 +193,17 @@ def scalability_simulation():
                 events[s].x = 1
                 stats.queue_edge.pop(0)
         # EndElse
+        if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
+            # Calcola il tempo di risposta medio (o altri dati rilevanti)
+            edge_wait = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
+            cloud_wait = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
+            E_wait = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
+            C_wait = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
+            stats.edge_wait_times.append((stats.t.current, edge_wait))
+            stats.cloud_wait_times.append((stats.t.current, cloud_wait))
+            stats.E_wait_times.append((stats.t.current, E_wait))
+            stats.C_wait_times.append((stats.t.current, C_wait))
+            current_checkpoint += 1
     # EndWhile
 
     stats.area_edge.queue = stats.area_edge.node
@@ -253,6 +270,7 @@ def scalability_simulation():
         cloud_weight_utilization.append(cloud_utilization[s] * work_time[s])
 
     return {
+        'stats': stats,
         'seed': seed,
         'edge_avg_wait': stats.area_edge.node / stats.index_edge if stats.index_edge > 0 else 0,
         'edge_avg_delay': stats.area_edge.queue / stats.index_edge if stats.index_edge > 0 else 0,
@@ -290,4 +308,3 @@ def scalability_simulation():
         'C_edge_server_service': edge_serviceC,
         'C_avg_number_edge': stats.area_C.node / stats.t.current if stats.t.current > 0 else 0,
     }
-

@@ -2,7 +2,6 @@ from simulation.priority_scalability_simulator import better_scalability_simulat
 from simulation.priority_simulator import *
 from simulation.scalability_simulator import scalability_simulation
 from simulation.simulator import *
-import matplotlib.pyplot as plt
 
 
 def start_simulation():
@@ -17,8 +16,6 @@ def start_simulation():
 
 def start_finite_simulation():
     replicationStats = ReplicationStats()
-    rep_response_times = []
-    seeds = []
 
     if MODEL == STANDARD:
         file_name = "finite_statistics.csv"
@@ -38,53 +35,48 @@ def start_finite_simulation():
     else:
         clear_file(file_name)
 
+    if TRANSIENT_ANALYSIS == 1:
+        stop = STOP_ANALYSIS
+    else:
+        stop = STOP
+
     for i in range(REPLICATIONS):
         if MODEL == STANDARD:
-            results, response_times = finite_simulation()
+            results, stats = finite_simulation(stop)
             write_file(results, file_name)
-            seeds.append(results["seed"])
-            append_stats(replicationStats, results)
-            rep_response_times.append(response_times)
+            append_stats(replicationStats, results, stats)
             type = "replications"
+            sim_type = "standard"
         elif MODEL == BETTER:
-            results = better_finite_simulation()
+            results, stats = better_finite_simulation(stop)
             write_file(results, file_name)
-            append_stats(replicationStats, results)
+            append_stats(replicationStats, results, stats)
             type = "replications"
+            sim_type = "better"
         elif MODEL == SCALABILITY:
-            results = scalability_simulation()
+            results = scalability_simulation(stop)
+            stats = results.pop("stats", None)
             write_file1(results, file_name)
-            append_scalability_stats(replicationStats, results)
+            append_scalability_stats(replicationStats, results, stats)
             type = "scalability"
+            sim_type = "scalability"
         else:
-            results = better_scalability_simulation()
+            results = better_scalability_simulation(stop)
+            stats = results.pop("stats", None)
             write_file1(results, file_name)
-            append_scalability_stats(replicationStats, results)
+            append_scalability_stats(replicationStats, results, stats)
             type = "scalability"
+            sim_type = "better_scalability"
 
     if type == "replications":
         print_simulation_stats(replicationStats, type)
     elif type == "scalability":
         print_scalability_simulation_stats(replicationStats)
 
-    plt.figure(figsize=(10, 6))
-
-    # Plot each run
-    for run_index, response_times in enumerate(rep_response_times):
-        times = [point[0] for point in response_times]
-        avg_response_times = [point[1] for point in response_times]
-        plt.plot(times, avg_response_times, label=f'Seed {seeds[run_index]}')
-
-    # Aggiungi etichette, titolo, legenda e griglia
-    plt.xlabel('Tempo (secondi)')
-    plt.ylabel('Tempo di risposta (secondi)')
-    plt.title('Analisi del transitorio')
-    plt.legend()
-    plt.grid(True)
-
-    # Mostra il grafico
-    plt.show()
-
+    plot_analysis(replicationStats.edge_wait_interval, replicationStats.seeds, "edge_node", sim_type)
+    plot_analysis(replicationStats.cloud_wait_interval, replicationStats.seeds, "cloud_server", sim_type)
+    plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
+    plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
 
 def start_infinite_simulation():
     if MODEL == STANDARD:

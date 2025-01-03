@@ -7,13 +7,18 @@ in_service = None # tracking type of job in service
 
 plantSeeds(SEED)
 
+time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint temporali ogni 1000 secondi
+current_checkpoint = 0  # Indicatore del checkpoint corrente
+
 # stream 0 -> arrivi dall'esterno
 # stream 1 -> servizio dell'edge tipo E
 # stream 2 -> servizio cloud server
 # stream 3 -> probabilità di routing
 # stream 4 -> servizio dell'edge tipo C
 
-def better_finite_simulation():
+def better_finite_simulation(stop):
+    global  current_checkpoint
+    current_checkpoint = 0
     s = getSeed()
     reset_arrival_temp()
 
@@ -21,13 +26,24 @@ def better_finite_simulation():
     stats.reset(START)  # reset stats
 
     # Simulation loop
-    while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
-        execute(stats, STOP)
+    while (stats.t.arrival < stop) or (stats.number_edge + stats.number_cloud > 0):
+        execute(stats, stop)
+        if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
+            # Calcola il tempo di risposta medio (o altri dati rilevanti)
+            edge_wait = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
+            cloud_wait = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
+            E_wait = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
+            C_wait = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
+            stats.edge_wait_times.append((stats.t.current, edge_wait))
+            stats.cloud_wait_times.append((stats.t.current, cloud_wait))
+            stats.E_wait_times.append((stats.t.current, E_wait))
+            stats.C_wait_times.append((stats.t.current, C_wait))
+            current_checkpoint += 1
 
     stats.calculate_area_queue()
 
     # Collect and return the results
-    return return_stats(stats, stats.t.current, s)
+    return return_stats(stats, stats.t.current, s), stats
 
 
 def better_infinite_simulation():
@@ -37,6 +53,7 @@ def better_infinite_simulation():
 
     batch_stats = ReplicationStats()
     stats = SimulationStats()
+    stats.reset(START)  # reset stats
 
     while len(batch_stats.edge_wait_times) < K:
 
@@ -44,11 +61,13 @@ def better_infinite_simulation():
             execute(stats, STOP_INFINITE)
         stop_time = stats.t.current - start_time
         start_time = stats.t.current
+        stats.calculate_area_queue()
         results = return_stats(stats, stop_time, s)
         write_file(results, "better_infinite_statistics.csv")
         append_stats(batch_stats, results)
         stats.reset_infinite()
 
+    remove_batch(batch_stats, 25)
     return batch_stats
 
 def execute(stats, stop):

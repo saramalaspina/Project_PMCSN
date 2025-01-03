@@ -5,6 +5,8 @@ from simulation.sim_utils import calculate_confidence_interval
 from utils.constants import *
 from simulation.autocorrelation import *
 import pandas as pd
+import matplotlib.pyplot as plt
+import os
 
 file_path = "simulation/../output/"
 
@@ -174,13 +176,14 @@ def print_autocorrelation(file_name):
         except Exception as e:
             print(f"Error {col}: {e}")
 
-    print("\nAutocorrelation Cloud Server")
-    for col in columns_cloud:
-        try:
-            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
-            print(f"{col}: {autocorr[0]}")
-        except Exception as e:
-            print(f"Error {col}: {e}")
+    if(P_C != 0):
+        print("\nAutocorrelation Cloud Server")
+        for col in columns_cloud:
+            try:
+                mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+                print(f"{col}: {autocorr[0]}")
+            except Exception as e:
+                print(f"Error {col}: {e}")
 
     print("\nAutocorrelation Edge Node type E jobs")
     for col in columns_E:
@@ -190,13 +193,14 @@ def print_autocorrelation(file_name):
         except Exception as e:
             print(f"Error {col}: {e}")
 
-    print("\nAutocorrelation Edge Node type C jobs")
-    for col in columns_C:
-        try:
-            mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
-            print(f"{col}: {autocorr[0]}")
-        except Exception as e:
-            print(f"Error {col}: {e}")
+    if (P_C != 0):
+        print("\nAutocorrelation Edge Node type C jobs")
+        for col in columns_C:
+            try:
+                mean, stdev, autocorr = calculate_autocorrelation(data[col].dropna().to_numpy())
+                print(f"{col}: {autocorr[0]}")
+            except Exception as e:
+                print(f"Error {col}: {e}")
 
 
 def write_file(results, file_name):
@@ -222,3 +226,29 @@ def clear_scalability_file(file_name):
     with open(path, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header1)
         writer.writeheader()
+
+def plot_analysis(wait_times, seed, name, sim_type):
+
+    if(TRANSIENT_ANALYSIS == 1):
+        output_dir = "simulation/../output/plot/transient_analysis"
+    else:
+        output_dir = f"simulation/../output/plot/{sim_type}"
+
+    plt.figure(figsize=(10, 6))
+
+    # Plot each run
+    for run_index, response_times in enumerate(wait_times):
+        times = [point[0] for point in response_times]
+        avg_response_times = [point[1] for point in response_times]
+        plt.plot(times, avg_response_times, label=f'Seed {seed[run_index]}')
+
+    # Aggiungi etichette, titolo, legenda e griglia
+    plt.xlabel('Tempo (secondi)')
+    plt.ylabel('Tempo di risposta (secondi)')
+    plt.legend()
+    plt.grid(True)
+
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, f'{name}.png')
+    plt.savefig(output_path)
+    plt.close()

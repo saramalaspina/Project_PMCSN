@@ -135,7 +135,7 @@ def FindOne(events, servers, i):
     return (s)
 
 
-def append_stats(replicationStats, results):
+def append_stats(replicationStats, results, stats):
     # append stats in the list
     replicationStats.edge_wait_times.append(results['edge_avg_wait'])
     replicationStats.edge_delays.append(results['edge_avg_delay'])
@@ -167,8 +167,14 @@ def append_stats(replicationStats, results):
     replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
     replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
 
+    replicationStats.edge_wait_interval.append(stats.edge_wait_times)
+    replicationStats.cloud_wait_interval.append(stats.cloud_wait_times)
+    replicationStats.E_wait_interval.append(stats.E_wait_times)
+    replicationStats.C_wait_interval.append(stats.C_wait_times)
 
-def append_scalability_stats(replicationStats, results):
+    replicationStats.seeds.append(results['seed'])
+
+def append_scalability_stats(replicationStats, results, stats):
     # append stats in the list
     replicationStats.edge_wait_times.append(results['edge_avg_wait'])
     replicationStats.edge_delays.append(results['edge_avg_delay'])
@@ -200,6 +206,12 @@ def append_scalability_stats(replicationStats, results):
     replicationStats.C_edge_number_node.append(results['C_avg_number_edge'])
     replicationStats.C_edge_number_queue.append(results['C_avg_number_queue_edge'])
 
+    replicationStats.edge_wait_interval.append(stats.edge_wait_times)
+    replicationStats.cloud_wait_interval.append(stats.cloud_wait_times)
+    replicationStats.E_wait_interval.append(stats.E_wait_times)
+    replicationStats.C_wait_interval.append(stats.C_wait_times)
+
+    replicationStats.seeds.append(results['seed'])
 
 def check_available_server(events, servers, i):
     found = 0
@@ -276,6 +288,10 @@ def set_work_time (current_lambda, work_time, slot_time, num_server):
 
     return work_time, slot_time
 
-
-
-
+def remove_batch(stats, n):
+    if n < 0:
+        raise ValueError()
+    for attr in dir(stats):
+        value = getattr(stats, attr)
+        if isinstance(value, list):
+            setattr(stats, attr, value[n:])

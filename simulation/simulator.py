@@ -7,7 +7,6 @@ from simulation.simulation_stats import*
 
 plantSeeds(SEED)
 
-response_times = []  # Lista per salvare i dati
 time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint temporali ogni 1000 secondi
 current_checkpoint = 0  # Indicatore del checkpoint corrente
 
@@ -17,9 +16,8 @@ current_checkpoint = 0  # Indicatore del checkpoint corrente
 # stream 3 -> probabilità di routing
 # stream 4 -> servizio dell'edge tipo C
 
-def finite_simulation():
-    global  current_checkpoint, response_times
-    response_times = []
+def finite_simulation(stop):
+    global  current_checkpoint
     current_checkpoint = 0
     s = getSeed()
     reset_arrival_temp()
@@ -27,21 +25,24 @@ def finite_simulation():
     stats = SimulationStats()  # init class
     stats.reset(START)  # reset stats
 
-    while (stats.t.arrival < STOP) or (stats.number_edge + stats.number_cloud > 0):
-        execute(stats, STOP)
+    while (stats.t.arrival < stop) or (stats.number_edge + stats.number_cloud > 0):
+        execute(stats, stop)
         if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
             # Calcola il tempo di risposta medio (o altri dati rilevanti)
-            #avg_response_time = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
-            #avg_response_time = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
-            #avg_response_time = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
-            avg_response_time = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
-            response_times.append((stats.t.current, avg_response_time))
+            edge_wait = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
+            cloud_wait = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
+            E_wait = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
+            C_wait = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
+            stats.edge_wait_times.append((stats.t.current, edge_wait))
+            stats.cloud_wait_times.append((stats.t.current, cloud_wait))
+            stats.E_wait_times.append((stats.t.current, E_wait))
+            stats.C_wait_times.append((stats.t.current, C_wait))
             current_checkpoint += 1
 
     stats.calculate_area_queue()
 
     # Collect and return the results
-    return return_stats(stats, stats.t.current, s), response_times
+    return return_stats(stats, stats.t.current, s), stats
 
 
 def infinite_simulation():
@@ -192,15 +193,3 @@ def return_stats(stats, t, s):
         'C_avg_number_queue_edge': stats.area_C.queue / t if t > 0 else 0,
         'C_utilization': stats.area_C.service / t if t > 0 else 0
     }
-
-
-def remove_batch(stats, n):
-    if n < 0:
-        raise ValueError()
-    for attr in dir(stats):
-        value = getattr(stats, attr)
-        if isinstance(value, list):
-            setattr(stats, attr, value[n:])
-
-
-
