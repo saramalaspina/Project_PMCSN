@@ -1,7 +1,7 @@
 from libraries.rngs import * # Multi-stream generator
 from simulation.sim_utils import*
 from simulation.simulation_output import *
-from utils.constants import*
+import utils.constants as cs
 from simulation.simulation_stats import*
 
 
@@ -111,7 +111,7 @@ def execute(stats, stop):
             stats.number_E -= 1
             stats.index_E += 1
             selectStream(3)
-            if random() < P_C:  # With probability p, send job to server 2
+            if random() < cs.P_C:  # With probability p, send job to server 2
                 stats.number_cloud += 1
                 if stats.number_cloud == 1:  # If server 2 is idle, start service
                     service = GetServiceCloud()

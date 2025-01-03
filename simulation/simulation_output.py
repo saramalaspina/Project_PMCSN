@@ -1,12 +1,15 @@
 import statistics
 import itertools
 import csv
+
+
 from simulation.sim_utils import calculate_confidence_interval
-from utils.constants import *
+import utils.constants as cs
 from simulation.autocorrelation import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from utils.constants import *
 
 file_path = "simulation/../output/"
 
@@ -176,7 +179,7 @@ def print_autocorrelation(file_name):
         except Exception as e:
             print(f"Error {col}: {e}")
 
-    if(P_C != 0):
+    if(cs.P_C != 0):
         print("\nAutocorrelation Cloud Server")
         for col in columns_cloud:
             try:
@@ -193,7 +196,7 @@ def print_autocorrelation(file_name):
         except Exception as e:
             print(f"Error {col}: {e}")
 
-    if (P_C != 0):
+    if (cs.P_C != 0):
         print("\nAutocorrelation Edge Node type C jobs")
         for col in columns_C:
             try:
@@ -230,9 +233,9 @@ def clear_scalability_file(file_name):
 def plot_analysis(wait_times, seed, name, sim_type):
 
     if(TRANSIENT_ANALYSIS == 1):
-        output_dir = "simulation/../output/plot/transient_analysis"
+        output_dir = "simulation/../output/plot/time/transient_analysis"
     else:
-        output_dir = f"simulation/../output/plot/{sim_type}"
+        output_dir = f"simulation/../output/plot/time/{sim_type}"
 
     plt.figure(figsize=(10, 6))
 
@@ -252,3 +255,6 @@ def plot_analysis(wait_times, seed, name, sim_type):
     output_path = os.path.join(output_dir, f'{name}.png')
     plt.savefig(output_path)
     plt.close()
+
+
+

@@ -4,6 +4,7 @@ from simulation.sim_utils import*
 from simulation.simulation_stats import*
 from simulation.simulation_output import *
 import utils.constants as cs
+from utils.constants import *
 
 plantSeeds(SEED)
 
@@ -101,7 +102,7 @@ def better_scalability_simulation(stop):
                 stats.number_E -= 1
                 stats.index_E += 1
                 selectStream(3)
-                if random() < P_C:  # With probability p, send job to cloud server
+                if random() < cs.P_C:  # With probability p, send job to cloud server
                     stats.number_cloud += 1
                     cloud_queue += 1
                     if check_available_server(events, EDGE_SERVERS_MAX + cs.CLOUD_SERVERS, EDGE_SERVERS_MAX+1) == 1:

@@ -1,4 +1,4 @@
-LAMBDA = 1.4  # mean arrival time [secondo/job]
+LAMBDA = 1.55  # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -29,6 +29,12 @@ def set_servers(edge_num, cloud_num):
 
 P_C = 0.4
 
+def set_probability(value):
+    global P_C
+    if value < 0 or value > 1:
+        return ValueError()
+    P_C = value
+
 SEED = 123456789
 
 REPLICATIONS = 7
@@ -41,7 +47,7 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = BETTER_SCALABILITY
+MODEL = BETTER
 
 START = 0.0  # initial time
 STOP = 86400  # terminal (close the door) time

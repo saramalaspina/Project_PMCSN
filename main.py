@@ -1,3 +1,5 @@
+from scipy.constants import value
+
 from simulation.priority_scalability_simulator import better_scalability_simulation
 from simulation.priority_simulator import *
 from simulation.scalability_simulator import scalability_simulation
@@ -6,12 +8,13 @@ from simulation.simulator import *
 
 def start_simulation():
     if SIMULATION_TYPE == FINITE:
-        start_finite_simulation()
+        stats = start_finite_simulation()
     elif SIMULATION_TYPE == INFINITE:
-        start_infinite_simulation()
+        stats = start_infinite_simulation()
     else:
         print("TYPE not valid!")
         exit(1)
+    return stats
 
 
 def start_finite_simulation():
@@ -78,6 +81,8 @@ def start_finite_simulation():
     plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
     plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
 
+    return replicationStats
+
 def start_infinite_simulation():
     if MODEL == STANDARD:
         file_name = "infinite_statistics.csv"
@@ -97,7 +102,51 @@ def start_infinite_simulation():
     print_simulation_stats(batch_stats, type)
     print_autocorrelation(file_name)
 
+    return batch_stats
+
+def plot_run_pc(sim_type):
+    path = f"simulation/../output/plot/pc/{sim_type}/"
+
+    if SIMULATION_TYPE == FINITE:
+        file_name = "finite.csv"
+        plot_name = "finite.png"
+    else:
+        file_name = "infinite.csv"
+        plot_name = "infinite.png"
+
+    with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
+        writer.writeheader()
+
+    for i in range(0,11):
+        set_probability(i/10)
+        print(cs.P_C)
+        stats = start_simulation()
+        with open(f"{path}{file_name}", 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
+            data = {
+                "Pc": cs.P_C,
+                "E_wait": statistics.mean(stats.E_edge_wait_times)
+            }
+            writer.writerow(data)
+
+    values = pd.read_csv(f"{path}{file_name}")
+    p_c = values['Pc']
+    E_wait = values['E_wait']
+
+    # Creazione del grafico
+    plt.figure(figsize=(8, 5))
+    plt.plot(p_c, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
+
+    # Personalizzazione del grafico
+    plt.title('E wait times')
+    plt.xlabel('Pc')
+    plt.ylabel('E wait time')
+    plt.grid(True)
+    plt.legend()
+
+    plt.savefig(f"{path}{plot_name}")
+
+#plot_run_pc("better")
 start_simulation()
-
-
 
