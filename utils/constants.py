@@ -1,4 +1,4 @@
-LAMBDA = 1.4  # mean arrival time [secondo/job]
+LAMBDA = 1.62  # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -47,7 +47,7 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = STANDARD
+MODEL = BETTER
 
 START = 0.0  # initial time
 STOP = 86400  # terminal (close the door) time
