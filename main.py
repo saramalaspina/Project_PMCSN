@@ -117,13 +117,13 @@ def plot_run_pc():
     path = f"simulation/../output/plot/pc/{sim_type}/"
 
     if SIMULATION_TYPE == FINITE:
-        file_name = "finite.csv"
-        plot_name = "finite.png"
+        file_name = f"finite_{LAMBDA}.csv"
+        plot_name = f"finite_{LAMBDA}.png"
     else:
-        file_name = "infinite.csv"
-        plot_name = "infinite.png"
+        file_name = f"infinite_{LAMBDA}.csv"
+        plot_name = f"infinite_{LAMBDA}.png"
 
-    with open(f"{path}{file_name}_{LAMBDA}", 'w', newline='', encoding='utf-8') as csvfile:
+    with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
         writer.writeheader()
 
@@ -154,7 +154,7 @@ def plot_run_pc():
     plt.grid(True)
     plt.legend()
 
-    plt.savefig(f"{path}{plot_name}_{LAMBDA}")
+    plt.savefig(f"{path}{plot_name}")
 
 plot_run_pc()
 #start_simulation()
