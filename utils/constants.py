@@ -1,4 +1,4 @@
-LAMBDA = 1.55  # mean arrival time [secondo/job]
+LAMBDA = 1.4  # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -37,7 +37,7 @@ def set_probability(value):
 
 SEED = 123456789
 
-REPLICATIONS = 7
+REPLICATIONS = 96
 
 INFINITE = 0
 FINITE = 1
@@ -47,7 +47,7 @@ BETTER = 0
 STANDARD = 1
 SCALABILITY = 2
 BETTER_SCALABILITY = 3
-MODEL = BETTER
+MODEL = STANDARD
 
 START = 0.0  # initial time
 STOP = 86400  # terminal (close the door) time

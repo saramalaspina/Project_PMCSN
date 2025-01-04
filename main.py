@@ -104,7 +104,16 @@ def start_infinite_simulation():
 
     return batch_stats
 
-def plot_run_pc(sim_type):
+def plot_run_pc():
+    if MODEL == STANDARD:
+        sim_type = "standard"
+    elif MODEL == BETTER:
+        sim_type = "better"
+    elif MODEL == SCALABILITY:
+        sim_type = "scalability"
+    else:
+        sim_type = "better_scalability"
+
     path = f"simulation/../output/plot/pc/{sim_type}/"
 
     if SIMULATION_TYPE == FINITE:
@@ -114,7 +123,7 @@ def plot_run_pc(sim_type):
         file_name = "infinite.csv"
         plot_name = "infinite.png"
 
-    with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
+    with open(f"{path}{file_name}_{LAMBDA}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
         writer.writeheader()
 
@@ -145,8 +154,8 @@ def plot_run_pc(sim_type):
     plt.grid(True)
     plt.legend()
 
-    plt.savefig(f"{path}{plot_name}")
+    plt.savefig(f"{path}{plot_name}_{LAMBDA}")
 
-#plot_run_pc("better")
-start_simulation()
+plot_run_pc()
+#start_simulation()
 
