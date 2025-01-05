@@ -65,7 +65,7 @@ def better_infinite_simulation():
         stats.calculate_area_queue()
         results = return_stats(stats, stop_time, s)
         write_file(results, "better_infinite_statistics.csv")
-        append_stats(batch_stats, results)
+        append_stats(batch_stats, results, stats)
         stats.reset_infinite()
 
     remove_batch(batch_stats, 25)
