@@ -7,9 +7,9 @@ from simulation.simulator import *
 
 
 def start_simulation():
-    if SIMULATION_TYPE == FINITE:
+    if cs.SIMULATION_TYPE == FINITE:
         stats = start_finite_simulation()
-    elif SIMULATION_TYPE == INFINITE:
+    elif cs.SIMULATION_TYPE == INFINITE:
         stats = start_infinite_simulation()
     else:
         print("TYPE not valid!")
@@ -20,43 +20,43 @@ def start_simulation():
 def start_finite_simulation():
     replicationStats = ReplicationStats()
 
-    if MODEL == STANDARD:
+    if cs.MODEL == STANDARD:
         file_name = "finite_statistics.csv"
         print("FINITE STANDARD SIMULATION")
-    elif MODEL == BETTER:
+    elif cs.MODEL == BETTER:
         file_name = "better_finite_statistics.csv"
         print("FINITE BETTER SIMULATION")
-    elif MODEL == SCALABILITY:
+    elif cs.MODEL == SCALABILITY:
         file_name = "scalability_statistics.csv"
         print("FINITE SCALABILITY SIMULATION")
     else:
         file_name = "better_scalability_statistics.csv"
         print("FINITE BETTER SCALABILITY SIMULATION")
 
-    if MODEL == SCALABILITY:
+    if cs.MODEL == SCALABILITY:
         clear_scalability_file(file_name)
     else:
         clear_file(file_name)
 
-    if TRANSIENT_ANALYSIS == 1:
+    if cs.TRANSIENT_ANALYSIS == 1:
         stop = STOP_ANALYSIS
     else:
         stop = STOP
 
-    for i in range(REPLICATIONS):
-        if MODEL == STANDARD:
+    for i in range(cs.REPLICATIONS):
+        if cs.MODEL == STANDARD:
             results, stats = finite_simulation(stop)
             write_file(results, file_name)
             append_stats(replicationStats, results, stats)
             type = "replications"
             sim_type = "standard"
-        elif MODEL == BETTER:
+        elif cs.MODEL == BETTER:
             results, stats = better_finite_simulation(stop)
             write_file(results, file_name)
             append_stats(replicationStats, results, stats)
             type = "replications"
             sim_type = "better"
-        elif MODEL == SCALABILITY:
+        elif cs.MODEL == SCALABILITY:
             results = scalability_simulation(stop)
             stats = results.pop("stats", None)
             write_file1(results, file_name)
@@ -76,22 +76,23 @@ def start_finite_simulation():
     elif type == "scalability":
         print_scalability_simulation_stats(replicationStats)
 
-    plot_analysis(replicationStats.edge_wait_interval, replicationStats.seeds, "edge_node", sim_type)
-    plot_analysis(replicationStats.cloud_wait_interval, replicationStats.seeds, "cloud_server", sim_type)
-    plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
-    plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
+    if cs.TRANSIENT_ANALYSIS == 1:
+        plot_analysis(replicationStats.edge_wait_interval, replicationStats.seeds, "edge_node", sim_type)
+        plot_analysis(replicationStats.cloud_wait_interval, replicationStats.seeds, "cloud_server", sim_type)
+        plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
+        plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
 
     return replicationStats
 
 def start_infinite_simulation():
-    if MODEL == STANDARD:
+    if cs.MODEL == STANDARD:
         file_name = "infinite_statistics.csv"
     else:
         file_name = "better_infinite_statistics.csv"
 
     clear_file(file_name)
 
-    if MODEL == STANDARD:
+    if cs.MODEL == STANDARD:
         batch_stats = infinite_simulation()
         print("INFINITE STANDARD SIMULATION")
     else:
@@ -105,23 +106,23 @@ def start_infinite_simulation():
     return batch_stats
 
 def plot_run_pc():
-    if MODEL == STANDARD:
+    if cs.MODEL == STANDARD:
         sim_type = "standard"
-    elif MODEL == BETTER:
+    elif cs.MODEL == BETTER:
         sim_type = "better"
-    elif MODEL == SCALABILITY:
+    elif cs.MODEL == SCALABILITY:
         sim_type = "scalability"
     else:
         sim_type = "better_scalability"
 
     path = f"simulation/../output/plot/pc/{sim_type}/"
 
-    if SIMULATION_TYPE == FINITE:
-        file_name = f"finite_{LAMBDA}.csv"
-        plot_name = f"finite_{LAMBDA}.png"
+    if cs.SIMULATION_TYPE == FINITE:
+        file_name = f"finite_{cs.LAMBDA}.csv"
+        plot_name = f"finite_{cs.LAMBDA}.png"
     else:
-        file_name = f"infinite_{LAMBDA}.csv"
-        plot_name = f"infinite_{LAMBDA}.png"
+        file_name = f"infinite_{cs.LAMBDA}.csv"
+        plot_name = f"infinite_{cs.LAMBDA}.png"
 
     with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
@@ -143,11 +144,9 @@ def plot_run_pc():
     p_c = values['Pc']
     E_wait = values['E_wait']
 
-    # Creazione del grafico
     plt.figure(figsize=(8, 5))
     plt.plot(p_c, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
 
-    # Personalizzazione del grafico
     plt.title('E wait times')
     plt.xlabel('Pc')
     plt.ylabel('E wait time')
@@ -156,6 +155,30 @@ def plot_run_pc():
 
     plt.savefig(f"{path}{plot_name}")
 
-plot_run_pc()
-#start_simulation()
+def start():
+    print("Select simulation:")
+    print("1. Single simulation")
+    print("2. Multiple run with different probabilities")
+    print("3. Transient analysis")
+    try:
+        choice = int(input("Select the number: "))
+        if choice == 1:
+            get_single_simulation()
+            start_simulation()
+        elif choice == 2:
+            get_multiple_simulation()
+            plot_run_pc()
+        elif choice == 3:
+            print("Select model:")
+            print("1. Standard")
+            print("2. Better")
+            model = int(input("Select the number: "))
+            set_transient_analysis(model)
+            start_simulation()
+        else:
+            raise ValueError()
+    except ValueError:
+        print("Error: invalid choice.")
+
+start()
 

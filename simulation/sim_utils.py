@@ -248,25 +248,21 @@ def AdjustServers(current_lambda, work_time, slot_time):
     # Edge node
     if cs.EDGE_SERVERS < cs.EDGE_SERVERS_MAX and edge_utilization / cs.EDGE_SERVERS > 0.8:  # add 1 server for utilization > 80%
         cs.increment_edge()
-        print(f"1 server added in the Edge node. Total: {cs.EDGE_SERVERS}")
         work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS)
 
     # Cloud server
     if cs.CLOUD_SERVERS < cs.CLOUD_SERVERS_MAX and cloud_utilization / cs.CLOUD_SERVERS > 0.8:  # add 1 server for utilization > 80%
         cs.increment_cloud()
-        print(f"1 server added in the Cloud server. Total: {cs.CLOUD_SERVERS}")
         work_time, slot_time = set_work_time(current_lambda, work_time, slot_time, cs.EDGE_SERVERS_MAX + cs.CLOUD_SERVERS)
 
     # condition for removing server
     # Edge node
     if cs.EDGE_SERVERS > 1 and edge_utilization / cs.EDGE_SERVERS < 0.3:  # remove 1 server for utilization < 30%
         cs.decrement_edge()
-        print(f"1 server removed from Edge node. Total: {cs.EDGE_SERVERS}")
 
     # Cloud server
     if cs.CLOUD_SERVERS > 1 and cloud_utilization / cs.CLOUD_SERVERS < 0.3:  # remove 1 server for utilization < 30%
         cs.decrement_cloud()
-        print(f"1 server removed from Cloud server. Total: {cs.CLOUD_SERVERS}")
 
     return work_time, slot_time
 
@@ -295,3 +291,49 @@ def remove_batch(stats, n):
         value = getattr(stats, attr)
         if isinstance(value, list):
             setattr(stats, attr, value[n:])
+
+
+def get_single_simulation():
+    print("Select model:")
+    print("1. Standard")
+    print("2. Better")
+    print("3. Standard Scalability")
+    print("4. Better Scalability")
+    model = int(input("Select the number: "))
+
+    if model < 1 or model > 4:
+        raise ValueError()
+
+    if model == 3 or model == 4:
+        sim = 1
+    else:
+        print("Select simulation:")
+        print("1. Finite")
+        print("2. Infinite")
+        sim = int(input("Select the number: "))
+
+    if sim < 1 or sim > 2:
+        raise ValueError()
+
+    cs.set_simulation(model, sim)
+
+
+def get_multiple_simulation():
+    print("Select model:")
+    print("1. Standard")
+    print("2. Better")
+    model = int(input("Select the number: "))
+
+    if model < 1 or model > 2:
+        raise ValueError()
+
+    else:
+        print("Select simulation:")
+        print("1. Finite")
+        print("2. Infinite")
+        sim = int(input("Select the number: "))
+
+    if sim < 1 or sim > 2:
+        raise ValueError()
+
+    cs.set_simulation(model, sim)

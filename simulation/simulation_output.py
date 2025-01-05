@@ -84,7 +84,7 @@ def print_all_stats(stats):
     print_job_counts(stats)
 
 def print_scalability_simulation_stats(stats):
-    print(f"\nStats after {REPLICATIONS} replications:")
+    print(f"\nStats after {cs.REPLICATIONS} replications:")
 
     # flat the list
     flat_edge_service = list(itertools.chain.from_iterable(stats.edge_service_times))
@@ -102,14 +102,14 @@ def print_scalability_simulation_stats(stats):
     print(f"Edge Node - Average wait time: {statistics.mean(stats.edge_wait_times):.6f} ± {calculate_confidence_interval(stats.edge_wait_times):.6f}")
     print(f"Edge Node - Average delay time: {statistics.mean(stats.edge_delays):.6f} ± {calculate_confidence_interval(stats.edge_delays):.6f}")
     print(f"Edge Node - Average service time: {statistics.mean(flat_edge_service):.6f} ± {calculate_confidence_interval(flat_edge_service):.6f}")
-    print(f"Edge Node - Utilization: {(sum(flat_edge_utilization)/REPLICATIONS):.6f} ± {calculate_confidence_interval(flat_edge_utilization):.6f}")
+    print(f"Edge Node - Utilization: {(sum(flat_edge_utilization)/cs.REPLICATIONS):.6f} ± {calculate_confidence_interval(flat_edge_utilization):.6f}")
     print(f"Edge Node - Average number in the node: {statistics.mean(stats.edge_number_node):.6f} ± {calculate_confidence_interval(stats.edge_number_node):.6f}")
     print(f"Edge Node - Average number in the queue: {statistics.mean(stats.edge_number_queue):.6f} ± {calculate_confidence_interval(stats.edge_number_queue):.6f}")
 
     print(f"\nCloud Server - Average wait time: {statistics.mean(stats.cloud_wait_times):.6f} ± {calculate_confidence_interval(stats.cloud_wait_times):.6f}")
     print(f"Cloud Server - Average delay time: {statistics.mean(stats.cloud_delays):.6f} ± {calculate_confidence_interval(stats.cloud_delays):.6f}")
     print(f"Cloud Server - Average service time: {statistics.mean(flat_cloud_service):.6f} ± {calculate_confidence_interval(flat_cloud_service):.6f}")
-    print(f"Cloud Server - Utilization: {(sum(flat_cloud_utilization))/REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_cloud_utilization):.6f}")
+    print(f"Cloud Server - Utilization: {(sum(flat_cloud_utilization))/cs.REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_cloud_utilization):.6f}")
     print(f"Cloud Server - Average number in the node: {statistics.mean(stats.cloud_number_node):.6f} ± {calculate_confidence_interval(stats.cloud_number_node):.6f}")
     print(f"Cloud Server - Average number in the queue: {statistics.mean(stats.cloud_number_queue):.6f} ± {calculate_confidence_interval(stats.cloud_number_queue):.6f}")
 
@@ -117,7 +117,7 @@ def print_scalability_simulation_stats(stats):
     print(f"Average wait time for E jobs: {statistics.mean(stats.E_edge_wait_times):.6f} ± {calculate_confidence_interval(stats.E_edge_wait_times):.6f}")
     print(f"Average delay time for E jobs: {statistics.mean(stats.E_edge_delays):.6f} ± {calculate_confidence_interval(stats.E_edge_delays):.6f}")
     print(f"Average service time for E jobs: {statistics.mean(flat_edge_serviceE):.6f} ± {calculate_confidence_interval(flat_edge_serviceE):.6f}")
-    print(f"Utilization for E jobs: {(sum(flat_edge_utilizationE))/REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_edge_utilizationE):.6f}")
+    print(f"Utilization for E jobs: {(sum(flat_edge_utilizationE))/cs.REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_edge_utilizationE):.6f}")
     print(f"Average number of E jobs in the node (edge): {statistics.mean(stats.E_edge_number_node):.6f} ± {calculate_confidence_interval(stats.E_edge_number_node):.6f}")
     print(f"Average number of E in the (edge) queue: {statistics.mean(stats.E_edge_number_queue):.6f} ± {calculate_confidence_interval(stats.E_edge_number_queue):.6f}")
 
@@ -125,13 +125,13 @@ def print_scalability_simulation_stats(stats):
     print(f"Average wait time for C jobs: {statistics.mean(stats.C_edge_wait_times):.6f} ± {calculate_confidence_interval(stats.C_edge_wait_times):.6f}")
     print(f"Average delay time for C jobs: {statistics.mean(stats.C_edge_delays):.6f} ± {calculate_confidence_interval(stats.C_edge_delays):.6f}")
     print(f"Average service time for C jobs: {statistics.mean(flat_edge_serviceC):.6f} ± {calculate_confidence_interval(flat_edge_serviceC):.6f}")
-    print(f"Utilization for C jobs: {(sum(flat_edge_utilizationC))/REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_edge_utilizationC):.6f}")
+    print(f"Utilization for C jobs: {(sum(flat_edge_utilizationC))/cs.REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_edge_utilizationC):.6f}")
     print(f"Average number of C jobs in the node (edge/cloud): {statistics.mean(stats.C_edge_number_node):.6f} ± {calculate_confidence_interval(stats.C_edge_number_node):.6f}")
     print(f"Average number of C in the (cloud) queue: {statistics.mean(stats.C_edge_number_queue):.6f} ± {calculate_confidence_interval(stats.C_edge_number_queue):.6f}")
 
 def print_simulation_stats(stats, type):
     if type == "replications":
-        print(f"\nStats after {REPLICATIONS} replications:")
+        print(f"\nStats after {cs.REPLICATIONS} replications:")
     elif type == "batch":
         print(f"\nStats for {K} batch:")
 
@@ -231,11 +231,7 @@ def clear_scalability_file(file_name):
         writer.writeheader()
 
 def plot_analysis(wait_times, seed, name, sim_type):
-
-    if(TRANSIENT_ANALYSIS == 1):
-        output_dir = "simulation/../output/plot/time/transient_analysis"
-    else:
-        output_dir = f"simulation/../output/plot/time/{sim_type}"
+    output_dir = f"simulation/../output/plot/transient_analysis/{sim_type}"
 
     plt.figure(figsize=(10, 6))
 
@@ -245,9 +241,8 @@ def plot_analysis(wait_times, seed, name, sim_type):
         avg_response_times = [point[1] for point in response_times]
         plt.plot(times, avg_response_times, label=f'Seed {seed[run_index]}')
 
-    # Aggiungi etichette, titolo, legenda e griglia
-    plt.xlabel('Tempo (secondi)')
-    plt.ylabel('Tempo di risposta (secondi)')
+    plt.xlabel('Time (s)')
+    plt.ylabel('Wait time (s)')
     plt.legend()
     plt.grid(True)
 
