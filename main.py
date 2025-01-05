@@ -164,8 +164,12 @@ def start():
     try:
         choice = int(input("Select the number: "))
         if choice == 1:
-            get_single_simulation()
-            start_simulation()
+            sim_type = get_single_simulation()
+            stats = start_simulation()
+            plot_wait_times(stats.edge_wait_interval, sim_type, "edge_node")
+            plot_wait_times(stats.cloud_wait_interval, sim_type, "cloud_server")
+            plot_wait_times(stats.E_wait_interval, sim_type, "edge_node_E")
+            plot_wait_times(stats.C_wait_interval, sim_type, "edge_node_C")
         elif choice == 2:
             get_multiple_simulation()
             plot_run_pc()

@@ -1,4 +1,4 @@
-LAMBDA = 1.62  # mean arrival time [secondo/job]
+LAMBDA = 1.4  # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -84,14 +84,20 @@ def set_simulation(model, sim_type):
     global SIMULATION_TYPE, MODEL
     if model == 1:
         MODEL = STANDARD
+        name = "standard"
     elif model == 2:
         MODEL = BETTER
+        name = "better"
     elif model == 3:
         MODEL = SCALABILITY
+        name = "scalability"
     else:
         MODEL = BETTER_SCALABILITY
+        name = "better_scalability"
 
     if sim_type == 1:
         SIMULATION_TYPE = FINITE
     else:
         SIMULATION_TYPE = INFINITE
+
+    return name

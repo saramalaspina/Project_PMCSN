@@ -256,7 +256,6 @@ def plot_servers(stats, sim_type):
 
     plt.figure(figsize=(10, 6))
 
-
     times = [point[0] for point in stats.edge_servers]
     edge_num = [point[1] for point in stats.edge_servers]
     cloud_num = [point[1] for point in stats.cloud_servers]
@@ -270,5 +269,23 @@ def plot_servers(stats, sim_type):
 
     os.makedirs(output_dir, exist_ok=True)
     output_path = os.path.join(output_dir, f'{cs.P_C}.png')
+    plt.savefig(output_path)
+    plt.close()
+
+def plot_wait_times(stats, sim_type, name):
+    output_dir = f"simulation/../output/plot/time/{sim_type}"
+    plt.figure(figsize=(10, 6))
+
+    for run_index, response_times in enumerate(stats):
+        times = [point[0] for point in response_times]
+        avg_response_times = [point[1] for point in response_times]
+        plt.plot(times, avg_response_times)
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('Wait time (s)')
+    plt.grid(True)
+
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, f'{name}.png')
     plt.savefig(output_path)
     plt.close()
