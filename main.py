@@ -75,6 +75,7 @@ def start_finite_simulation():
         print_simulation_stats(replicationStats, type)
     elif type == "scalability":
         print_scalability_simulation_stats(replicationStats)
+        plot_servers(stats, sim_type)
 
     if cs.TRANSIENT_ANALYSIS == 1:
         plot_analysis(replicationStats.edge_wait_interval, replicationStats.seeds, "edge_node", sim_type)

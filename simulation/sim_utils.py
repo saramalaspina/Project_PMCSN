@@ -241,8 +241,8 @@ def GetLambda(current_time):
 
 
 def AdjustServers(current_lambda, work_time, slot_time):
-    edge_utilization = current_lambda * 0.54
-    cloud_utilization = (current_lambda * 0.4) * 0.8
+    edge_utilization = current_lambda * (0.5+0.1*cs.P_C)
+    cloud_utilization = (current_lambda * cs.P_C) * 0.8
 
     # conditions for adding server
     # Edge node

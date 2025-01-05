@@ -251,5 +251,24 @@ def plot_analysis(wait_times, seed, name, sim_type):
     plt.savefig(output_path)
     plt.close()
 
+def plot_servers(stats, sim_type):
+    output_dir = f"simulation/../output/plot/servers/{sim_type}"
+
+    plt.figure(figsize=(10, 6))
 
 
+    times = [point[0] for point in stats.edge_servers]
+    edge_num = [point[1] for point in stats.edge_servers]
+    cloud_num = [point[1] for point in stats.cloud_servers]
+    plt.plot(times, edge_num, label=f'Edge Servers', color = 'blue', linestyle='--')
+    plt.plot(times, cloud_num, label=f'Cloud Servers', color = 'red', linestyle=':')
+
+    plt.xlabel('Time (s)')
+    plt.ylabel('Server')
+    plt.legend()
+    plt.grid(True)
+
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, f'{cs.P_C}.png')
+    plt.savefig(output_path)
+    plt.close()

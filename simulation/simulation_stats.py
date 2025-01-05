@@ -47,6 +47,9 @@ class SimulationStats:
         self.E_wait_times = []
         self.C_wait_times = []
 
+        self.edge_servers = []
+        self.cloud_servers = []
+
     def reset(self, start_time):
         self.t.current = start_time
         self.t.completion_edge = float('inf')
