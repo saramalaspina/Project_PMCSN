@@ -169,7 +169,7 @@ def run_pc():
     plt.grid(True)
     plt.legend()
 
-    output_path = os.path.join(path, f'{plot_name}.png')
+    output_path = os.path.join(path, plot_name)
     plt.savefig(output_path)
     plt.close()
 

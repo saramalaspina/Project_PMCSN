@@ -253,10 +253,10 @@ def better_scalability_simulation(stop):
         cloud_utilization.append(sum[s].service / stats.t.current) if stats.t.current > 0 else 0
 
     if stats.index_C == 0:
-        edge_serviceC = [0] * EDGE_SERVERS
-        edge_utilizationC = [0] * EDGE_SERVERS
-        cloud_service = [0] * CLOUD_SERVERS
-        cloud_utilization = [0] * CLOUD_SERVERS
+        edge_serviceC = [0] * EDGE_SERVERS_MAX
+        edge_utilizationC = [0] * EDGE_SERVERS_MAX
+        cloud_service = [0] * CLOUD_SERVERS_MAX
+        cloud_utilization = [0] * CLOUD_SERVERS_MAX
 
     for s in range(0, EDGE_SERVERS_MAX):
         edge_weight_utilization.append(edge_utilization[s] * work_time[s])
@@ -264,7 +264,7 @@ def better_scalability_simulation(stop):
         edge_weight_utilizationC.append(edge_utilizationC[s] * work_time[s])
 
     for s in range(0, CLOUD_SERVERS_MAX):
-        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s])
+        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s+EDGE_SERVERS_MAX])
 
     return {
         'stats': stats,
