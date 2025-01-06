@@ -80,10 +80,11 @@ def start_finite_simulation():
         plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
         plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
     else:
-        plot_wait_times(replicationStats.edge_wait_interval, sim_type, "edge_node")
-        plot_wait_times(replicationStats.cloud_wait_interval, sim_type, "cloud_server")
-        plot_wait_times(replicationStats.E_wait_interval, sim_type, "edge_node_E")
-        plot_wait_times(replicationStats.C_wait_interval, sim_type, "edge_node_C")
+        if PRINT_PLOT_TIME == 1:
+            plot_wait_times(replicationStats.edge_wait_interval, sim_type, "edge_node")
+            plot_wait_times(replicationStats.cloud_wait_interval, sim_type, "cloud_server")
+            plot_wait_times(replicationStats.E_wait_interval, sim_type, "edge_node_E")
+            plot_wait_times(replicationStats.C_wait_interval, sim_type, "edge_node_C")
 
 
 def start_infinite_simulation():

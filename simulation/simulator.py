@@ -66,6 +66,12 @@ def infinite_simulation():
         append_stats(batch_stats, results, stats)
         stats.reset_infinite()
 
+    if PRINT_PLOT_BATCH == 1:
+        plot_batch(batch_stats.edge_wait_times, "standard", "edge_node")
+        plot_batch(batch_stats.cloud_wait_times, "standard", "cloud_server")
+        plot_batch(batch_stats.E_edge_wait_times, "standard", "edge_node_E")
+        plot_batch(batch_stats.C_edge_wait_times, "standard", "edge_node_C")
+
     remove_batch(batch_stats, 25)
     return batch_stats
 

@@ -68,6 +68,12 @@ def better_infinite_simulation():
         append_stats(batch_stats, results, stats)
         stats.reset_infinite()
 
+    if PRINT_PLOT_BATCH == 1:
+        plot_batch(batch_stats.edge_wait_times, "better", "edge_node")
+        plot_batch(batch_stats.cloud_wait_times, "better", "cloud_server")
+        plot_batch(batch_stats.E_edge_wait_times, "better", "edge_node_E")
+        plot_batch(batch_stats.C_edge_wait_times, "better", "edge_node_C")
+
     remove_batch(batch_stats, 25)
     return batch_stats
 
@@ -93,17 +99,17 @@ def execute(stats, stop):
 
     stats.t.current = stats.t.next  # advance the clock */
 
-    if (stats.t.current == stats.t.arrival):  # process an arrival */
+    if stats.t.current == stats.t.arrival:  # process an arrival */
         stats.job_arrived += 1
         stats.number_edge += 1
         stats.number_E += 1
         stats.queue_edge_E += 1
         stats.t.arrival = GetArrival()
-        if (stats.t.arrival > stop):
+        if stats.t.arrival > stop:
             stats.t.last = stats.t.current
             stats.t.arrival = INFINITY
 
-        if (stats.number_edge == 1):
+        if stats.number_edge == 1:
             service = GetServiceEdgeE()
             stats.t.completion_edge = stats.t.current + service
             in_service = "E"

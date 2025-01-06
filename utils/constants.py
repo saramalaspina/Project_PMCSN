@@ -66,6 +66,9 @@ ALPHA = 0.05 # 95% confidence
 K = 128
 B = 4080
 
+PRINT_PLOT_TIME = 0
+PRINT_PLOT_BATCH = 1
+
 def set_transient_analysis(model):
     global TRANSIENT_ANALYSIS, REPLICATIONS, SIMULATION_TYPE, P_C, LAMBDA, MODEL
     TRANSIENT_ANALYSIS = 1
@@ -84,16 +87,12 @@ def set_simulation(model, sim_type):
     global SIMULATION_TYPE, MODEL
     if model == 1:
         MODEL = STANDARD
-        name = "standard"
     elif model == 2:
         MODEL = BETTER
-        name = "better"
     elif model == 3:
         MODEL = SCALABILITY
-        name = "scalability"
     else:
         MODEL = BETTER_SCALABILITY
-        name = "better_scalability"
 
     if sim_type == 1:
         SIMULATION_TYPE = FINITE
