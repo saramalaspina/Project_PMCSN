@@ -175,7 +175,7 @@ def start():
             get_single_simulation()
             start_simulation()
         elif choice == 2:
-            get_multiple_simulation()
+            get_single_simulation()
             run_pc()
         elif choice == 3:
             print("Select model:")
