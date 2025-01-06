@@ -122,10 +122,16 @@ def run_pc():
 
     if cs.SIMULATION_TYPE == FINITE:
         file_name = f"finite_{cs.LAMBDA}.csv"
-        plot_name = f"finite_{cs.LAMBDA}.png"
+        if sim_type == "scalability" or sim_type == "better_scalability":
+            plot_name = f"finite.png"
+        else:
+            plot_name = f"finite_{cs.LAMBDA}.png"
     else:
         file_name = f"infinite_{cs.LAMBDA}.csv"
-        plot_name = f"infinite_{cs.LAMBDA}.png"
+        if sim_type == "scalability" or sim_type == "better_scalability":
+            plot_name = f"infinite.png"
+        else:
+            plot_name = f"infinite_{cs.LAMBDA}.png"
 
     with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
