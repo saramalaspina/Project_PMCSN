@@ -1,5 +1,3 @@
-from scipy.constants import value
-
 from simulation.priority_scalability_simulator import better_scalability_simulation
 from simulation.priority_simulator import *
 from simulation.scalability_simulator import scalability_simulation
@@ -8,13 +6,12 @@ from simulation.simulator import *
 
 def start_simulation():
     if cs.SIMULATION_TYPE == FINITE:
-        stats = start_finite_simulation()
+        start_finite_simulation()
     elif cs.SIMULATION_TYPE == INFINITE:
-        stats = start_infinite_simulation()
+        start_infinite_simulation()
     else:
         print("TYPE not valid!")
         exit(1)
-    return stats
 
 
 def start_finite_simulation():
@@ -82,8 +79,12 @@ def start_finite_simulation():
         plot_analysis(replicationStats.cloud_wait_interval, replicationStats.seeds, "cloud_server", sim_type)
         plot_analysis(replicationStats.E_wait_interval, replicationStats.seeds, "edge_node_E", sim_type)
         plot_analysis(replicationStats.C_wait_interval, replicationStats.seeds, "edge_node_C", sim_type)
+    else:
+        plot_wait_times(replicationStats.edge_wait_interval, sim_type, "edge_node")
+        plot_wait_times(replicationStats.cloud_wait_interval, sim_type, "cloud_server")
+        plot_wait_times(replicationStats.E_wait_interval, sim_type, "edge_node_E")
+        plot_wait_times(replicationStats.C_wait_interval, sim_type, "edge_node_C")
 
-    return replicationStats
 
 def start_infinite_simulation():
     if cs.MODEL == STANDARD:
@@ -106,7 +107,7 @@ def start_infinite_simulation():
 
     return batch_stats
 
-def plot_run_pc():
+def run_pc():
     if cs.MODEL == STANDARD:
         sim_type = "standard"
     elif cs.MODEL == BETTER:
@@ -164,15 +165,11 @@ def start():
     try:
         choice = int(input("Select the number: "))
         if choice == 1:
-            sim_type = get_single_simulation()
-            stats = start_simulation()
-            plot_wait_times(stats.edge_wait_interval, sim_type, "edge_node")
-            plot_wait_times(stats.cloud_wait_interval, sim_type, "cloud_server")
-            plot_wait_times(stats.E_wait_interval, sim_type, "edge_node_E")
-            plot_wait_times(stats.C_wait_interval, sim_type, "edge_node_C")
+            get_single_simulation()
+            start_simulation()
         elif choice == 2:
             get_multiple_simulation()
-            plot_run_pc()
+            run_pc()
         elif choice == 3:
             print("Select model:")
             print("1. Standard")

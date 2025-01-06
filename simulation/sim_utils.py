@@ -315,9 +315,7 @@ def get_single_simulation():
     if sim < 1 or sim > 2:
         raise ValueError()
 
-    name = cs.set_simulation(model, sim)
-
-    return name
+    cs.set_simulation(model, sim)
 
 
 def get_multiple_simulation():

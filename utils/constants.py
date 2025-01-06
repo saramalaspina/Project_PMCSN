@@ -41,7 +41,7 @@ REPLICATIONS = 96
 
 INFINITE = 0
 FINITE = 1
-SIMULATION_TYPE = INFINITE
+SIMULATION_TYPE = FINITE
 
 BETTER = 0
 STANDARD = 1
@@ -51,7 +51,7 @@ MODEL = SCALABILITY
 
 START = 0.0  # initial time
 STOP = 86400  # terminal (close the door) time
-STOP_ANALYSIS = 86400
+STOP_ANALYSIS = 300000
 STOP_INFINITE = float('inf')
 INFINITY = float('inf')  # must be much larger than STOP
 
@@ -100,4 +100,3 @@ def set_simulation(model, sim_type):
     else:
         SIMULATION_TYPE = INFINITE
 
-    return name
