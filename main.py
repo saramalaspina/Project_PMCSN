@@ -6,12 +6,13 @@ from simulation.simulator import *
 
 def start_simulation():
     if cs.SIMULATION_TYPE == FINITE:
-        start_finite_simulation()
+        stats = start_finite_simulation()
     elif cs.SIMULATION_TYPE == INFINITE:
-        start_infinite_simulation()
+        stats = start_infinite_simulation()
     else:
         print("TYPE not valid!")
         exit(1)
+    return stats
 
 
 def start_finite_simulation():
@@ -86,6 +87,8 @@ def start_finite_simulation():
             plot_wait_times(replicationStats.E_wait_interval, sim_type, "edge_node_E")
             plot_wait_times(replicationStats.C_wait_interval, sim_type, "edge_node_C")
 
+    return replicationStats
+
 
 def start_infinite_simulation():
     if cs.MODEL == STANDARD:
@@ -121,17 +124,21 @@ def run_pc():
     path = f"simulation/../output/plot/pc/{sim_type}/"
 
     if cs.SIMULATION_TYPE == FINITE:
-        file_name = f"finite_{cs.LAMBDA}.csv"
         if sim_type == "scalability" or sim_type == "better_scalability":
+            file_name = f"finite.csv"
             plot_name = f"finite.png"
         else:
             plot_name = f"finite_{cs.LAMBDA}.png"
+            file_name = f"finite_{cs.LAMBDA}.csv"
     else:
-        file_name = f"infinite_{cs.LAMBDA}.csv"
         if sim_type == "scalability" or sim_type == "better_scalability":
             plot_name = f"infinite.png"
+            file_name = f"infinite.csv"
         else:
             plot_name = f"infinite_{cs.LAMBDA}.png"
+            file_name = f"infinite_{cs.LAMBDA}.csv"
+
+    os.makedirs(path, exist_ok=True)
 
     with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
@@ -162,7 +169,10 @@ def run_pc():
     plt.grid(True)
     plt.legend()
 
-    plt.savefig(f"{path}{plot_name}")
+    output_path = os.path.join(path, f'{plot_name}.png')
+    plt.savefig(output_path)
+    plt.close()
+
 
 def start():
     print("Select simulation:")

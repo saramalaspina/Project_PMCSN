@@ -270,7 +270,7 @@ def scalability_simulation(stop):
         edge_weight_utilizationC.append(edge_utilizationC[s] * work_time[s])
 
     for s in range(0, CLOUD_SERVERS_MAX):
-        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s])
+        cloud_weight_utilization.append(cloud_utilization[s] * work_time[s+EDGE_SERVERS_MAX])
 
     return {
         'stats': stats,

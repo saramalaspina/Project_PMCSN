@@ -27,7 +27,7 @@ def set_servers(edge_num, cloud_num):
     EDGE_SERVERS = edge_num
     CLOUD_SERVERS = cloud_num
 
-P_C = 0.4
+P_C = 0
 
 def set_probability(value):
     global P_C
