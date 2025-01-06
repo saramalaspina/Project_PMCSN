@@ -190,6 +190,16 @@ def better_scalability_simulation(stop):
         if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
             stats.edge_servers.append((stats.t.current, cs.EDGE_SERVERS))
             stats.cloud_servers.append((stats.t.current, cs.CLOUD_SERVERS))
+
+            edge_wait = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
+            cloud_wait = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
+            E_wait = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
+            C_wait = (stats.area_C.node / stats.index_C) if stats.index_C > 0 else 0,
+            stats.edge_wait_times.append((stats.t.current, edge_wait))
+            stats.cloud_wait_times.append((stats.t.current, cloud_wait))
+            stats.E_wait_times.append((stats.t.current, E_wait))
+            stats.C_wait_times.append((stats.t.current, C_wait))
+
             current_checkpoint += 1
     # EndWhile
 
