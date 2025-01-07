@@ -1,8 +1,8 @@
 from libraries.rngs import * # Multi-stream generator
-from simulation.sim_utils import*
-from simulation.simulation_output import *
+from utils.sim_utils import*
+from utils.simulation_output import *
 import utils.constants as cs
-from simulation.simulation_stats import*
+from utils.simulation_stats import*
 
 
 plantSeeds(SEED)

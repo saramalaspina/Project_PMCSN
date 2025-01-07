@@ -3,9 +3,9 @@ import itertools
 import csv
 
 
-from simulation.sim_utils import calculate_confidence_interval
+from utils.sim_utils import calculate_confidence_interval
 import utils.constants as cs
-from simulation.autocorrelation import *
+from utils.autocorrelation import *
 import pandas as pd
 import matplotlib.pyplot as plt
 import os

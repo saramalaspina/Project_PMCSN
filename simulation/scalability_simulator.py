@@ -1,6 +1,6 @@
 from libraries.rngs import plantSeeds, getSeed
-from simulation.sim_utils import*
-from simulation.simulation_stats import *
+from utils.sim_utils import*
+from utils.simulation_stats import *
 from utils.constants import *
 import utils.constants as cs
 
