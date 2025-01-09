@@ -249,7 +249,8 @@ def start():
             get_simulation()
             run_pc()
         elif choice == 3:
-            lambda_values = get_lambda_simulation()
+            get_lambda_simulation()
+            lambda_values = [1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8]
             run_lambda(lambda_values)
         elif choice == 4:
             print("Select model:")

@@ -337,10 +337,3 @@ def get_lambda_simulation():
         raise ValueError()
 
     cs.set_simulation(model, sim)
-
-    if model == 1:
-        lambda_values = [1.4, 1.5, 1.6, 1.7, 1.8]
-    else:
-        lambda_values = [1.4, 1.5, 1.6, 1.7, 1.8]
-
-    return lambda_values

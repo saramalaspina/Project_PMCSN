@@ -190,8 +190,7 @@ def multiserver_simultation(current_lambda):
 def start_multiserver():
     #lambda_values = [0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
     #lambda_values = [0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.6]
-    #lambda_values = [0.4, 1.0, 1.6, 2.2, 2.8, 3.4, 4.0, 4.6, 5.2]
-    lambda_values = [3.4]
+    lambda_values = [0.4, 1.0, 1.6, 2.2, 2.8, 3.4, 4.0, 4.6, 5.2]
     replication_res = []
     lambda_res = []
     for i in range(len(lambda_values)):
