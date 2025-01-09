@@ -293,7 +293,7 @@ def remove_batch(stats, n):
             setattr(stats, attr, value[n:])
 
 
-def get_single_simulation():
+def get_simulation():
     print("Select model:")
     print("1. Standard")
     print("2. Better")
@@ -318,7 +318,7 @@ def get_single_simulation():
     cs.set_simulation(model, sim)
 
 
-def get_multiple_simulation():
+def get_lambda_simulation():
     print("Select model:")
     print("1. Standard")
     print("2. Better")
@@ -337,3 +337,10 @@ def get_multiple_simulation():
         raise ValueError()
 
     cs.set_simulation(model, sim)
+
+    if model == 1:
+        lambda_values = [1.4, 1.5, 1.6, 1.7, 1.8]
+    else:
+        lambda_values = [1.4, 1.5, 1.6, 1.7, 1.8]
+
+    return lambda_values

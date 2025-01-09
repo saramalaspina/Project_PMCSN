@@ -167,7 +167,67 @@ def run_pc():
     plt.xlabel('Pc')
     plt.ylabel('E wait time')
     plt.grid(True)
-    plt.legend()
+
+    output_path = os.path.join(path, plot_name)
+    plt.savefig(output_path)
+    plt.close()
+
+def run_lambda(lambda_values):
+    if cs.MODEL == STANDARD:
+        sim_type = "standard"
+    elif cs.MODEL == BETTER:
+        sim_type = "better"
+    elif cs.MODEL == SCALABILITY:
+        sim_type = "scalability"
+    else:
+        sim_type = "better_scalability"
+
+    path = f"simulation/../output/plot/lambda/{sim_type}/"
+
+    if cs.SIMULATION_TYPE == FINITE:
+        if sim_type == "scalability" or sim_type == "better_scalability":
+            file_name = f"finite.csv"
+            plot_name = f"finite.png"
+        else:
+            plot_name = f"finite_{cs.P_C}.png"
+            file_name = f"finite_{cs.P_C}.csv"
+    else:
+        if sim_type == "scalability" or sim_type == "better_scalability":
+            plot_name = f"infinite.png"
+            file_name = f"infinite.csv"
+        else:
+            plot_name = f"infinite_{cs.P_C}.png"
+            file_name = f"infinite_{cs.P_C}.csv"
+
+    os.makedirs(path, exist_ok=True)
+
+    with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["Lambda", "E_wait"])
+        writer.writeheader()
+
+    for i in range(len(lambda_values)):
+        set_lambda(lambda_values[i])
+        print(cs.LAMBDA)
+        stats = start_simulation()
+        with open(f"{path}{file_name}", 'a', newline='', encoding='utf-8') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=["Lambda", "E_wait"])
+            data = {
+                "Lambda": cs.LAMBDA,
+                "E_wait": statistics.mean(stats.E_edge_wait_times)
+            }
+            writer.writerow(data)
+
+    values = pd.read_csv(f"{path}{file_name}")
+    lambda_val = values['Lambda']
+    E_wait = values['E_wait']
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(lambda_val, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
+
+    plt.title('E wait times')
+    plt.xlabel('Lambda')
+    plt.ylabel('E wait time')
+    plt.grid(True)
 
     output_path = os.path.join(path, plot_name)
     plt.savefig(output_path)
@@ -178,16 +238,20 @@ def start():
     print("Select simulation:")
     print("1. Single simulation")
     print("2. Multiple run with different probabilities")
-    print("3. Transient analysis")
+    print("3. Multiple run with different lambda")
+    print("4. Transient analysis")
     try:
         choice = int(input("Select the number: "))
         if choice == 1:
-            get_single_simulation()
+            get_simulation()
             start_simulation()
         elif choice == 2:
-            get_single_simulation()
+            get_simulation()
             run_pc()
         elif choice == 3:
+            lambda_values = get_lambda_simulation()
+            run_lambda(lambda_values)
+        elif choice == 4:
             print("Select model:")
             print("1. Standard")
             print("2. Better")

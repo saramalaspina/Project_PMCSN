@@ -1,10 +1,10 @@
-LAMBDA = 1.4  # mean arrival time [secondo/job]
+LAMBDA = 1.8 # mean arrival time [secondo/job]
 
-EDGE_SERVERS = 1
-CLOUD_SERVERS = 1
+EDGE_SERVERS = 2
+CLOUD_SERVERS = 2
 
-EDGE_SERVERS_MAX = 3
-CLOUD_SERVERS_MAX = 3
+EDGE_SERVERS_MAX = 2
+CLOUD_SERVERS_MAX = 2
 
 def increment_edge():
     global EDGE_SERVERS
@@ -27,7 +27,7 @@ def set_servers(edge_num, cloud_num):
     EDGE_SERVERS = edge_num
     CLOUD_SERVERS = cloud_num
 
-P_C = 0
+P_C = 0.4
 
 def set_probability(value):
     global P_C
@@ -67,7 +67,7 @@ K = 128
 B = 4080
 
 PRINT_PLOT_TIME = 0
-PRINT_PLOT_BATCH = 1
+PRINT_PLOT_BATCH = 0
 
 def set_transient_analysis(model):
     global TRANSIENT_ANALYSIS, REPLICATIONS, SIMULATION_TYPE, P_C, LAMBDA, MODEL
@@ -98,4 +98,8 @@ def set_simulation(model, sim_type):
         SIMULATION_TYPE = FINITE
     else:
         SIMULATION_TYPE = INFINITE
+
+def set_lambda(value):
+    global LAMBDA
+    LAMBDA = value
 
