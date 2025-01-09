@@ -175,29 +175,13 @@ def run_pc():
 def run_lambda(lambda_values):
     if cs.MODEL == STANDARD:
         sim_type = "standard"
-    elif cs.MODEL == BETTER:
-        sim_type = "better"
-    elif cs.MODEL == SCALABILITY:
-        sim_type = "scalability"
     else:
-        sim_type = "better_scalability"
+        sim_type = "better"
 
     path = f"simulation/../output/plot/lambda/{sim_type}/"
 
-    if cs.SIMULATION_TYPE == FINITE:
-        if sim_type == "scalability" or sim_type == "better_scalability":
-            file_name = f"finite.csv"
-            plot_name = f"finite.png"
-        else:
-            plot_name = f"finite_{cs.P_C}.png"
-            file_name = f"finite_{cs.P_C}.csv"
-    else:
-        if sim_type == "scalability" or sim_type == "better_scalability":
-            plot_name = f"infinite.png"
-            file_name = f"infinite.csv"
-        else:
-            plot_name = f"infinite_{cs.P_C}.png"
-            file_name = f"infinite_{cs.P_C}.csv"
+    plot_name = f"infinite.png"
+    file_name = f"infinite.csv"
 
     os.makedirs(path, exist_ok=True)
 
@@ -221,10 +205,12 @@ def run_lambda(lambda_values):
     lambda_val = values['Lambda']
     E_wait = values['E_wait']
 
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(10, 6))
     plt.plot(lambda_val, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
 
-    plt.title('E wait times')
+    plt.axhline(y=3, color='r', linestyle='--')
+
+    plt.title(f'E wait times with Pc 0.4')
     plt.xlabel('Lambda')
     plt.ylabel('E wait time')
     plt.grid(True)
@@ -250,7 +236,7 @@ def start():
             run_pc()
         elif choice == 3:
             get_lambda_simulation()
-            lambda_values = [1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8]
+            lambda_values = [1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75]
             run_lambda(lambda_values)
         elif choice == 4:
             print("Select model:")

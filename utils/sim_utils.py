@@ -327,13 +327,4 @@ def get_lambda_simulation():
     if model < 1 or model > 2:
         raise ValueError()
 
-    else:
-        print("Select simulation:")
-        print("1. Finite")
-        print("2. Infinite")
-        sim = int(input("Select the number: "))
-
-    if sim < 1 or sim > 2:
-        raise ValueError()
-
-    cs.set_simulation(model, sim)
+    cs.set_simulation(model, 2)
