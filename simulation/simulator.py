@@ -78,35 +78,35 @@ def infinite_simulation():
 def execute(stats, stop):
     stats.t.next = Min(stats.t.arrival, stats.t.completion_edge, stats.t.completion_cloud)  # next event time   */
 
-    if (stats.number_edge > 0): # update integrals  */
+    if stats.number_edge > 0: # update integrals  */
         stats.area_edge.node += (stats.t.next - stats.t.current) * stats.number_edge
     # EndIf
 
-    if (stats.number_cloud > 0):  # update integrals  */
+    if stats.number_cloud > 0:  # update integrals  */
         stats.area_cloud.node += (stats.t.next - stats.t.current) * stats.number_cloud
     # EndIf
 
-    if (stats.number_E > 0):  # update integrals  */
+    if stats.number_E > 0:  # update integrals  */
         stats.area_E.node += (stats.t.next - stats.t.current) * stats.number_E
     # EndIf
 
-    if (stats.number_C > 0):  # update integrals  */
+    if stats.number_C > 0:  # update integrals  */
         stats.area_C.node += (stats.t.next - stats.t.current) * stats.number_C
     # EndIf
 
     stats.t.current = stats.t.next  # advance the clock */
 
-    if (stats.t.current == stats.t.arrival):  # process an arrival */
+    if stats.t.current == stats.t.arrival:  # process an arrival */
         stats.job_arrived += 1
         stats.number_edge += 1
         stats.number_E += 1
         stats.queue_edge.append("E")
         stats.t.arrival = GetArrival()
-        if (stats.t.arrival > stop):
+        if stats.t.arrival > stop:
             stats.t.last = stats.t.current
             stats.t.arrival = INFINITY
 
-        if (stats.number_edge == 1):
+        if stats.number_edge == 1:
             service = GetServiceEdgeE()
             stats.t.completion_edge = stats.t.current + service
             stats.area_edge.service += service

@@ -123,20 +123,12 @@ def run_pc():
 
     path = f"simulation/../output/plot/pc/{sim_type}/"
 
-    if cs.SIMULATION_TYPE == FINITE:
-        if sim_type == "scalability" or sim_type == "better_scalability":
-            file_name = f"finite.csv"
-            plot_name = f"finite.png"
-        else:
-            plot_name = f"finite_{cs.LAMBDA}.png"
-            file_name = f"finite_{cs.LAMBDA}.csv"
+    if sim_type == "scalability" or sim_type == "better_scalability":
+        file_name = f"finite.csv"
+        plot_name = f"finite.png"
     else:
-        if sim_type == "scalability" or sim_type == "better_scalability":
-            plot_name = f"infinite.png"
-            file_name = f"infinite.csv"
-        else:
-            plot_name = f"infinite_{cs.LAMBDA}.png"
-            file_name = f"infinite_{cs.LAMBDA}.csv"
+        plot_name = f"finite_{cs.LAMBDA}.png"
+        file_name = f"finite_{cs.LAMBDA}.csv"
 
     os.makedirs(path, exist_ok=True)
 
@@ -162,6 +154,8 @@ def run_pc():
 
     plt.figure(figsize=(8, 5))
     plt.plot(p_c, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
+
+    plt.axhline(y=3, color='r', linestyle='--')
 
     plt.title('E wait times')
     plt.xlabel('Pc')
@@ -232,7 +226,7 @@ def start():
             get_simulation()
             start_simulation()
         elif choice == 2:
-            get_simulation()
+            get_p_simulation()
             run_pc()
         elif choice == 3:
             get_lambda_simulation()

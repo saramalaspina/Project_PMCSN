@@ -25,12 +25,12 @@ def Min(a, b, c):
 
 def Exponential(m):
     """Generate an Exponential random variate, use m > 0.0."""
-    return (-m * log(1.0 - random()))
+    return -m * log(1.0 - random())
 
 
 def Uniform(a, b):
     """Generate a Uniform random variate, use a < b."""
-    return (a + (b - a) * random())
+    return a + (b - a) * random()
 
 
 def idfTruncatedNormal(m, s, a, b):
@@ -225,7 +225,7 @@ def check_available_server(events, servers, i):
 def GetLambda(current_time):
     # 6:00 -> 10:00 | 16:00 -> 20:00 : high time slot
     if 21600 <= current_time < 36000 or 57600 <= current_time < 72000:
-        return 2.7
+        return 2.5
     # 10:00 -> 13:00 | 20:00 -> 23:00 : average time slot
     elif 36000 <= current_time < 46800 or 72000 <= current_time < 82800:
         return 1.4
@@ -234,7 +234,7 @@ def GetLambda(current_time):
         return 0.8
     # 23:00 -> 00:00 | 00:00 -> 6:00 -> : very low time slot
     elif 82800 <= current_time < 86400 or 0 <= current_time < 21600:
-        return 0.2
+        return 0.4
     # default
     else:
         return 1.4
@@ -269,7 +269,7 @@ def AdjustServers(current_lambda, work_time, slot_time):
 
 def set_work_time (current_lambda, work_time, slot_time, num_server):
     # this function calculates the fraction of work of a server based on slot time
-    if current_lambda == 2.7 and slot_time[num_server - 1].highSlotTime == 0:
+    if current_lambda == 2.5 and slot_time[num_server - 1].highSlotTime == 0:
         slot_time[num_server - 1].highSlotTime = 1
         work_time[num_server - 1] += 8/24
     elif current_lambda == 1.4 and slot_time[num_server - 1].averageSlotTime == 0:
@@ -278,7 +278,7 @@ def set_work_time (current_lambda, work_time, slot_time, num_server):
     elif current_lambda == 0.8 and slot_time[num_server - 1].lowSlotTime == 0:
         slot_time[num_server - 1].lowSlotTime = 1
         work_time[num_server - 1] += 3/24
-    elif current_lambda == 0.2 and slot_time[num_server - 1].minSlotTime == 0:
+    elif current_lambda == 0.4 and slot_time[num_server - 1].minSlotTime == 0:
         slot_time[num_server - 1].minSlotTime = 1
         work_time[num_server - 1] += 7/24
 
@@ -328,3 +328,17 @@ def get_lambda_simulation():
         raise ValueError()
 
     cs.set_simulation(model, 2)
+
+def get_p_simulation():
+    print("Select model:")
+    print("1. Standard")
+    print("2. Better")
+    print("3. Standard Scalability")
+    print("4. Better Scalability")
+    model = int(input("Select the number: "))
+
+    if model < 1 or model > 4:
+        raise ValueError()
+
+    cs.set_simulation(model, 1)
+
