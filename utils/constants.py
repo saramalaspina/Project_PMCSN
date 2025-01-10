@@ -1,10 +1,10 @@
-LAMBDA = 1.54 # mean arrival time [secondo/job]
+LAMBDA = 1.4 # mean arrival time [secondo/job]
 
-EDGE_SERVERS = 2
-CLOUD_SERVERS = 2
+EDGE_SERVERS = 1
+CLOUD_SERVERS = 1
 
-EDGE_SERVERS_MAX = 2
-CLOUD_SERVERS_MAX = 2
+EDGE_SERVERS_MAX = 3
+CLOUD_SERVERS_MAX = 3
 
 def increment_edge():
     global EDGE_SERVERS
@@ -67,7 +67,7 @@ K = 128
 B = 4080
 
 PRINT_PLOT_TIME = 0
-PRINT_PLOT_BATCH = 0
+PRINT_PLOT_BATCH = 1
 
 def set_transient_analysis(model):
     global TRANSIENT_ANALYSIS, REPLICATIONS, SIMULATION_TYPE, P_C, LAMBDA, MODEL
