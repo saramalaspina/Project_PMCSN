@@ -299,11 +299,10 @@ def plot_batch(wait_times, sim_type, name):
     wait_times.insert(0, 0)
     x_values = [index * cs.B for index in range(len(wait_times))]
 
-    # Creazione del plot
     plt.figure(figsize=(10, 6))
     plt.plot(x_values, wait_times, linestyle='-', color='b')
-    plt.xlabel('Num scan', fontsize=12)
-    plt.ylabel('Wait time', fontsize=12)
+    plt.xlabel('Job')
+    plt.ylabel('Wait time')
     plt.grid(True)
 
     os.makedirs(output_dir, exist_ok=True)
