@@ -107,7 +107,8 @@ def start_infinite_simulation():
 
     type = "batch"
     print_simulation_stats(batch_stats, type)
-    print_autocorrelation(file_name)
+    if cs.PRINT_AUTOCORRELATION == 1:
+        print_autocorrelation(file_name)
 
     return batch_stats
 
@@ -160,6 +161,7 @@ def run_pc():
     plt.title('E wait times')
     plt.xlabel('Pc')
     plt.ylabel('E wait time')
+    plt.title(f'E wait times with lambda = {cs.LAMBDA}')
     plt.grid(True)
 
     output_path = os.path.join(path, plot_name)
@@ -185,6 +187,7 @@ def run_lambda(lambda_values):
 
     for i in range(len(lambda_values)):
         set_lambda(lambda_values[i])
+        putSeed(SEED)
         print(cs.LAMBDA)
         stats = start_simulation()
         with open(f"{path}{file_name}", 'a', newline='', encoding='utf-8') as csvfile:
@@ -204,7 +207,7 @@ def run_lambda(lambda_values):
 
     plt.axhline(y=3, color='r', linestyle='--')
 
-    plt.title(f'E wait times with Pc 0.4')
+    plt.title('E wait times with Pc = 0.4')
     plt.xlabel('Lambda')
     plt.ylabel('E wait time')
     plt.grid(True)
@@ -231,6 +234,7 @@ def start():
         elif choice == 3:
             get_lambda_simulation()
             lambda_values = [1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75]
+            set_autocorrelation(0)
             run_lambda(lambda_values)
         elif choice == 4:
             print("Select model:")

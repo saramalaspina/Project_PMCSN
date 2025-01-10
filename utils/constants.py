@@ -1,4 +1,4 @@
-LAMBDA = 1.54 # mean arrival time [secondo/job]
+LAMBDA = 1.55 # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 2
 CLOUD_SERVERS = 2
@@ -69,6 +69,8 @@ B = 4080
 PRINT_PLOT_TIME = 0
 PRINT_PLOT_BATCH = 0
 
+PRINT_AUTOCORRELATION = 1
+
 def set_transient_analysis(model):
     global TRANSIENT_ANALYSIS, REPLICATIONS, SIMULATION_TYPE, P_C, LAMBDA, MODEL
     TRANSIENT_ANALYSIS = 1
@@ -102,4 +104,9 @@ def set_simulation(model, sim_type):
 def set_lambda(value):
     global LAMBDA
     LAMBDA = value
+
+def set_autocorrelation(value):
+    global PRINT_AUTOCORRELATION
+    PRINT_AUTOCORRELATION = value
+
 
