@@ -133,6 +133,7 @@ def run_pc():
 
     os.makedirs(path, exist_ok=True)
 
+
     with open(f"{path}{file_name}", 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=["Pc", "E_wait"])
         writer.writeheader()
@@ -156,12 +157,14 @@ def run_pc():
     plt.figure(figsize=(8, 5))
     plt.plot(p_c, E_wait, marker='o', linestyle='-', color='b', label='E wait time')
 
-    plt.axhline(y=3, color='r', linestyle='--')
-
     plt.title('E wait times')
     plt.xlabel('Pc')
     plt.ylabel('E wait time')
-    plt.title(f'E wait times with lambda = {cs.LAMBDA}')
+    if(sim_type == "scalability" or sim_type == "better_scalability"):
+        plt.title(f'E wait times')
+    else:
+        plt.title(f'E wait times with lambda = {cs.LAMBDA}')
+        plt.axhline(y=3, color='r', linestyle='--')
     plt.grid(True)
 
     output_path = os.path.join(path, plot_name)

@@ -1,10 +1,10 @@
 LAMBDA = 1.55 # mean arrival time [secondo/job]
 
-EDGE_SERVERS = 2
-CLOUD_SERVERS = 2
+EDGE_SERVERS = 1
+CLOUD_SERVERS = 1
 
-EDGE_SERVERS_MAX = 2
-CLOUD_SERVERS_MAX = 2
+EDGE_SERVERS_MAX = 3
+CLOUD_SERVERS_MAX = 3
 
 def increment_edge():
     global EDGE_SERVERS
