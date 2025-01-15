@@ -1,4 +1,4 @@
-LAMBDA = 1.55 # mean arrival time [secondo/job]
+LAMBDA = 1.4 # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -67,7 +67,7 @@ K = 128
 B = 4080
 
 PRINT_PLOT_TIME = 0
-PRINT_PLOT_BATCH = 0
+PRINT_PLOT_BATCH = 1
 
 PRINT_AUTOCORRELATION = 1
 
