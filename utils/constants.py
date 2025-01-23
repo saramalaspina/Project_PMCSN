@@ -1,4 +1,4 @@
-LAMBDA = 1.4 # mean arrival time [secondo/job]
+LAMBDA = 1.65 # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
