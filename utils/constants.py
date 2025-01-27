@@ -1,4 +1,4 @@
-LAMBDA = 1.62  # mean arrival time [secondo/job]
+LAMBDA = 1.65 # mean arrival time [secondo/job]
 
 EDGE_SERVERS = 1
 CLOUD_SERVERS = 1
@@ -6,42 +6,34 @@ CLOUD_SERVERS = 1
 EDGE_SERVERS_MAX = 3
 CLOUD_SERVERS_MAX = 3
 
-
 def increment_edge():
     global EDGE_SERVERS
     EDGE_SERVERS += 1
-
 
 def decrement_edge():
     global EDGE_SERVERS
     EDGE_SERVERS -= 1
 
-
 def increment_cloud():
     global CLOUD_SERVERS
     CLOUD_SERVERS += 1
 
-
 def decrement_cloud():
     global CLOUD_SERVERS
     CLOUD_SERVERS -= 1
-
 
 def set_servers(edge_num, cloud_num):
     global EDGE_SERVERS, CLOUD_SERVERS
     EDGE_SERVERS = edge_num
     CLOUD_SERVERS = cloud_num
 
-
 P_C = 0.4
-
 
 def set_probability(value):
     global P_C
     if value < 0 or value > 1:
         return ValueError()
     P_C = value
-
 
 SEED = 123456789
 
@@ -69,16 +61,15 @@ SERVICE_DISTRIBUTION = EXPONENTIAL
 
 TRANSIENT_ANALYSIS = 0
 
-ALPHA = 0.05  # 95% confidence
+ALPHA = 0.05 # 95% confidence
 
 K = 128
 B = 4080
 
 PRINT_PLOT_TIME = 0
-PRINT_PLOT_BATCH = 0
+PRINT_PLOT_BATCH = 1
 
 PRINT_AUTOCORRELATION = 1
-
 
 def set_transient_analysis(model):
     global TRANSIENT_ANALYSIS, REPLICATIONS, SIMULATION_TYPE, P_C, LAMBDA, MODEL
@@ -93,7 +84,6 @@ def set_transient_analysis(model):
         MODEL = BETTER
     else:
         raise ValueError()
-
 
 def set_simulation(model, sim_type):
     global SIMULATION_TYPE, MODEL
@@ -111,11 +101,9 @@ def set_simulation(model, sim_type):
     else:
         SIMULATION_TYPE = INFINITE
 
-
 def set_lambda(value):
     global LAMBDA
     LAMBDA = value
-
 
 def set_autocorrelation(value):
     global PRINT_AUTOCORRELATION

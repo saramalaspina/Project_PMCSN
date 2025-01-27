@@ -307,12 +307,15 @@ def plot_wait_times(stats, sim_type, name):
 
 def plot_batch(wait_times, sim_type, name):
     output_dir = f"simulation/../output/plot/batch/{sim_type}"
-    wait_times.insert(0, 0)
-    x_values = [index * cs.B for index in range(len(wait_times))]
+
+    x_values = [index for index in range(len(wait_times)+1)]
+    y_values = [0]
+    for i in range(len(wait_times)):
+        y_values.append(statistics.mean(wait_times[:i+1]))
 
     plt.figure(figsize=(10, 6))
-    plt.plot(x_values, wait_times, linestyle='-', color='b')
-    plt.xlabel('Job')
+    plt.plot(x_values, y_values, linestyle='-', color='b')
+    plt.xlabel('Batch')
     plt.ylabel('Wait time')
     plt.grid(True)
 
