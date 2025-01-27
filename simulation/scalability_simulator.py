@@ -6,8 +6,8 @@ import utils.constants as cs
 
 plantSeeds(SEED)
 
-time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint temporali ogni 1000 secondi
-current_checkpoint = 0  # Indicatore del checkpoint corrente
+time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint each 1000 sec
+current_checkpoint = 0
 
 def scalability_simulation(stop):
     global current_checkpoint
@@ -28,8 +28,8 @@ def scalability_simulation(stop):
     cloud_queue = 0
     work_time = [0] * (EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)
 
-    work_time[0] = 1 # at least one server at edge node is always allocated (100%)
-    work_time[EDGE_SERVERS_MAX] = 1 # at least one server at cloud server is always allocated (100%)
+    work_time[0] = 1  # at least one server at edge node is always allocated (100%)
+    work_time[EDGE_SERVERS_MAX] = 1  # at least one server at cloud server is always allocated (100%)
 
     slot_time = [slotTime() for i in range(EDGE_SERVERS_MAX + CLOUD_SERVERS_MAX)]
 

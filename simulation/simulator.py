@@ -7,14 +7,14 @@ from utils.simulation_stats import*
 
 plantSeeds(SEED)
 
-time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint temporali ogni 1000 secondi
-current_checkpoint = 0  # Indicatore del checkpoint corrente
+time_checkpoints = list(range(0, STOP_ANALYSIS, 1000))  # Checkpoint each 1000 sec
+current_checkpoint = 0
 
-# stream 0 -> arrivi dall'esterno
-# stream 1 -> servizio dell'edge tipo E
-# stream 2 -> servizio cloud server
-# stream 3 -> probabilità di routing
-# stream 4 -> servizio dell'edge tipo C
+# stream 0 -> external arrival
+# stream 1 -> type E service at Edge node
+# stream 2 -> Cloud server service
+# stream 3 -> routing probability
+# stream 4 -> type C service at Edge node
 
 def finite_simulation(stop):
     global  current_checkpoint
@@ -28,7 +28,6 @@ def finite_simulation(stop):
     while (stats.t.arrival < stop) or (stats.number_edge + stats.number_cloud > 0):
         execute(stats, stop)
         if current_checkpoint < len(time_checkpoints) and stats.t.current >= time_checkpoints[current_checkpoint]:
-            # Calcola il tempo di risposta medio (o altri dati rilevanti)
             edge_wait = (stats.area_edge.node / stats.index_edge) if stats.index_edge > 0 else 0
             cloud_wait = (stats.area_cloud.node / stats.index_cloud) if stats.index_cloud > 0 else 0
             E_wait = (stats.area_E.node / stats.index_E) if stats.index_E > 0 else 0
@@ -74,6 +73,7 @@ def infinite_simulation():
 
     remove_batch(batch_stats, 25)
     return batch_stats
+
 
 def execute(stats, stop):
     stats.t.next = Min(stats.t.arrival, stats.t.completion_edge, stats.t.completion_cloud)  # next event time   */

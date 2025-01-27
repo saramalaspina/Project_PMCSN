@@ -1,8 +1,6 @@
 import statistics
 import itertools
 import csv
-
-
 from utils.sim_utils import calculate_confidence_interval
 import utils.constants as cs
 from utils.autocorrelation import *
@@ -43,6 +41,7 @@ def print_edge_stats(stats):
     print(f"   Utilization ............. = {stats.area_edge.service / stats.t.current:.6f}")
     print(f"   Average interarrival time = {stats.t.last / stats.index_edge:.6f}")
 
+
 def print_cloud_stats(stats):
     if stats.index_cloud > 0:
         print(f"\nFor {stats.index_cloud} jobs processed by cloud server:")
@@ -53,6 +52,7 @@ def print_cloud_stats(stats):
         print(f"   Average # in the queue .. = {stats.area_cloud.queue / stats.t.current:.6f}")
         print(f"   Utilization ............. = {stats.area_cloud.service / stats.t.current:.6f}")
 
+
 def print_type_E_stats(stats):
     print(f"\nFor {stats.index_E} type E jobs processed by edge node:")
     print(f"   Average wait ............ = {stats.area_E.node / stats.index_E:.6f}")
@@ -61,6 +61,7 @@ def print_type_E_stats(stats):
     print(f"   Average # in the node ... = {stats.area_E.node / stats.t.current:.6f}")
     print(f"   Average # in the queue .. = {stats.area_E.queue / stats.t.current:.6f}")
     print(f"   Utilization ............. = {stats.area_E.service / stats.t.current:.6f}")
+
 
 def print_type_C_stats(stats):
     if stats.index_C > 0:
@@ -72,9 +73,11 @@ def print_type_C_stats(stats):
         print(f"   Average # in the queue .. = {stats.area_C.queue / stats.t.current:.6f}")
         print(f"   Utilization ............. = {stats.area_C.service / stats.t.current:.6f}")
 
+
 def print_job_counts(stats):
     print(f"\nNumber of type E jobs that leave the system = {stats.count_E}")
     print(f"Number of type C jobs that leave the system = {stats.count_C}")
+
 
 def print_all_stats(stats):
     print_edge_stats(stats)
@@ -82,6 +85,7 @@ def print_all_stats(stats):
     print_type_E_stats(stats)
     print_type_C_stats(stats)
     print_job_counts(stats)
+
 
 def print_scalability_simulation_stats(stats):
     print(f"\nStats after {cs.REPLICATIONS} replications:")
@@ -132,6 +136,7 @@ def print_scalability_simulation_stats(stats):
     print(f"Utilization for C jobs: {(sum(flat_edge_utilizationC))/cs.REPLICATIONS:.6f} ± {calculate_confidence_interval(flat_edge_utilizationC):.6f}")
     print(f"Average number of C jobs in the node (edge/cloud): {statistics.mean(stats.C_edge_number_node):.6f} ± {calculate_confidence_interval(stats.C_edge_number_node):.6f}")
     print(f"Average number of C in the (cloud) queue: {statistics.mean(stats.C_edge_number_queue):.6f} ± {calculate_confidence_interval(stats.C_edge_number_queue):.6f}")
+
 
 def print_simulation_stats(stats, type):
     if type == "replications":
@@ -222,17 +227,20 @@ def write_file1(results, file_name):
         writer = csv.DictWriter(csvfile, fieldnames=header1)
         writer.writerow(results)
 
+
 def clear_file(file_name):
     path = file_path + file_name
     with open(path, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header)
         writer.writeheader()
 
+
 def clear_scalability_file(file_name):
     path = file_path + file_name
     with open(path, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=header1)
         writer.writeheader()
+
 
 def plot_analysis(wait_times, seed, name, sim_type):
     output_dir = f"simulation/../output/plot/transient_analysis/{sim_type}"
@@ -255,6 +263,7 @@ def plot_analysis(wait_times, seed, name, sim_type):
     plt.savefig(output_path)
     plt.close()
 
+
 def plot_servers(stats, sim_type):
     output_dir = f"simulation/../output/plot/servers/{sim_type}"
 
@@ -276,6 +285,7 @@ def plot_servers(stats, sim_type):
     plt.savefig(output_path)
     plt.close()
 
+
 def plot_wait_times(stats, sim_type, name):
     output_dir = f"simulation/../output/plot/time/{sim_type}"
     plt.figure(figsize=(10, 6))
@@ -293,6 +303,7 @@ def plot_wait_times(stats, sim_type, name):
     output_path = os.path.join(output_dir, f'{name}.png')
     plt.savefig(output_path)
     plt.close()
+
 
 def plot_batch(wait_times, sim_type, name):
     output_dir = f"simulation/../output/plot/batch/{sim_type}"

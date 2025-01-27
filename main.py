@@ -112,6 +112,8 @@ def start_infinite_simulation():
 
     return batch_stats
 
+
+# plot graphics with different value of p_c
 def run_pc():
     if cs.MODEL == STANDARD:
         sim_type = "standard"
@@ -171,6 +173,8 @@ def run_pc():
     plt.savefig(output_path)
     plt.close()
 
+
+# plot graphics with different value of lambda
 def run_lambda(lambda_values):
     if cs.MODEL == STANDARD:
         sim_type = "standard"
@@ -220,6 +224,7 @@ def run_lambda(lambda_values):
     plt.close()
 
 
+# cmd menu
 def start():
     print("Select simulation:")
     print("1. Single simulation")

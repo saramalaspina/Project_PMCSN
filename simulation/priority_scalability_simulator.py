@@ -6,8 +6,9 @@ from utils.constants import *
 
 plantSeeds(SEED)
 
-time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint temporali ogni 1000 secondi
-current_checkpoint = 0  # Indicatore del checkpoint corrente
+time_checkpoints = list(range(0, STOP, 1000))  # Checkpoint each 1000 sec
+current_checkpoint = 0
+
 
 def better_scalability_simulation(stop):
     global current_checkpoint
@@ -95,7 +96,7 @@ def better_scalability_simulation(stop):
                 stats.queue_edge_E -= 1
             # EndIf
         # EndIf
-        elif 1 <= e <= EDGE_SERVERS_MAX: # completion at edge node
+        elif 1 <= e <= EDGE_SERVERS_MAX:  # completion at edge node
             if events[e].type == "E":
                 stats.number_E -= 1
                 stats.index_E += 1

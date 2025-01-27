@@ -14,6 +14,7 @@ class Time:
         self.next = -1  # next (most imminent) event time
         self.last = -1  # last arrival time
 
+
 class SimulationStats:
     def __init__(self):
         self.job_arrived = 0 # used to count arrived jobs
@@ -32,13 +33,13 @@ class SimulationStats:
         self.queue_edge_E = 0 # number of type E in edge queue for better simulation
         self.queue_edge_C = 0 # number of type C in edge queue for better simulation
 
-        # Tracciamento delle aree per statistiche
+        # Tracking area for statistics
         self.area_edge = Track() # stats tracking for server 1
         self.area_cloud = Track() # stats tracking for server 2
         self.area_E = Track() # stats tracking job of type E
         self.area_C = Track() # stats tracking job of type C in edge node
 
-        # Variabile per i tempi
+        # variables for times
         self.t = Time()
         self.queue_edge = [] # A list to track the type of jobs waiting at the edge node
 
@@ -54,7 +55,7 @@ class SimulationStats:
         self.t.current = start_time
         self.t.completion_edge = float('inf')
         self.t.completion_cloud = float('inf')
-        self.queue_edge.clear()  # Svuota la coda
+        self.queue_edge.clear()  # clear queue
         self.edge_wait_times.clear()
         self.cloud_wait_times.clear()
         self.E_wait_times.clear()
@@ -81,6 +82,7 @@ class SimulationStats:
         self.area_cloud.queue = self.area_cloud.node - self.area_cloud.service
         self.area_E.queue = self.area_E.node - self.area_E.service
         self.area_C.queue = self.area_C.node - self.area_C.service
+
 
 class ReplicationStats:
     def __init__(self):
