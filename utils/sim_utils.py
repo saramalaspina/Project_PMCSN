@@ -64,28 +64,19 @@ def reset_arrival_temp():
 def GetServiceEdgeE():
     """Generate the next service time for both servers."""
     selectStream(1)
-    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
-        return Exponential(0.5)
-    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.5, 0.1, 0, 2)
+    return Exponential(0.5)
 
 
 def GetServiceEdgeC():
     """Generate the second service time at the edge after returning from the cloud."""
     selectStream(4)
-    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
-        return Exponential(0.1)
-    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.1, 0.1, 0, 1)
+    return Exponential(0.1)
 
 
 def GetServiceCloud():
     """Generate the next service time for both servers."""
     selectStream(2)
-    if cs.SERVICE_DISTRIBUTION == cs.EXPONENTIAL:
-        return Exponential(0.8)
-    elif cs.SERVICE_DISTRIBUTION == cs.TRUNCATED_NORMAL:
-        return idfTruncatedNormal(0.8, 0.1, 0, 3)
+    return Exponential(0.8)
 
 
 def calculate_confidence_interval(data):
