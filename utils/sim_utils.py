@@ -17,7 +17,6 @@ service_rates = {
     'cloud_server': 0.8
 }
 
-
 def Min(a, b, c):
     """Return the smallest of a, b, c."""
     return min(a, b, c)

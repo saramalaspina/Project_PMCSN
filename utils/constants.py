@@ -91,7 +91,6 @@ def set_simulation(model, sim_type):
         MODEL = SCALABILITY
     else:
         MODEL = BETTER_SCALABILITY
-
     if sim_type == 1:
         SIMULATION_TYPE = FINITE
     else:
